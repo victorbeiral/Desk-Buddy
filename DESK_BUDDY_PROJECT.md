@@ -1,6 +1,6 @@
 # DESK BUDDY — Documento mestre do projeto
 
-**Revisão:** 1.1 — 13/11/2026  
+**Revisão:** 1.2 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
 **Último firmware com execução confirmada:** v1.8.1 (cinco testes aprovados pelo usuário)  
 **Firmware mais recente testado em hardware:** v1.8.1 — cinco testes aprovados; leitura ICS em tarefa FreeRTOS
@@ -68,7 +68,10 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 - Fidelidade visual e áreas de toque dependem de foto/teste no dispositivo.
 
 ### AGENDA
-- Mostrar títulos e horários reais, em ordem cronológica; quatro reuniões por página.
+
+**Nova especificação aprovada para próxima versão (proposta v1.9.0, ainda não implementada/testada):** mostrar no máximo dois eventos, sem paginação. Se houver evento em andamento, destacá-lo e mostrar o próximo futuro; caso contrário, mostrar os dois próximos futuros. Abaixo, exibir `+N eventos hoje` para a quantidade de eventos restantes depois dos exibidos; não contar eventos encerrados nem os dois visíveis. Se houver somente um evento, mostrar um cartão; se não houver, indicar agenda livre. Recalcular com a passagem do tempo. Preservar HOME v1.8.1 sem ajustes e manter leitura ICS em segundo plano e retorno HOME por touch. Em caso de eventos simultâneos, a política de seleção ainda requer validação de uso.
+
+- Na v1.8.1, quatro reuniões por página; substituição por visão de dois eventos aprovada para próxima implementação.
 - Destacar reunião em andamento apenas se a hora simulada/real estiver dentro do intervalo.
 - Truncar visualmente títulos longos sem alterar o ICS.
 - Simulação inicial de testes: **segunda-feira, 16/11/2026 às 08:00**; permitir retorno ao relógio real.
@@ -143,6 +146,9 @@ Após validar: ajustar touch/layout; melhorar recorrências e fusos; reintegrar 
 8. A publicação inicial desta revisão foi autorizada pelo usuário em 13/11/2026, **como referência inicial pendente de validação de conteúdo**.
 
 ## 10. Itens ainda pendentes de aprovação técnica
+
+- [x] HOME v1.8.1 aprovada visualmente sem mudanças.
+- [x] Novo comportamento de AGENDA com dois eventos e contador aprovado como requisito; implementação e validação pendentes.
 
 - [ ] Validar o conteúdo integral desta documentação como especificação oficial.
 - [ ] Confirmar a fidelidade da HOME com quatro cartões após teste visual.
