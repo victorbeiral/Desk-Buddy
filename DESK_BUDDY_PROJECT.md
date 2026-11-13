@@ -1,9 +1,9 @@
 # DESK BUDDY — Documento mestre do projeto
 
-**Revisão:** 1.3 — 13/11/2026  
+**Revisão:** 1.4 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
 **Último firmware com execução confirmada:** v1.8.1 (cinco testes aprovados pelo usuário)  
-**Firmware mais recente testado em hardware:** v1.8.1 — cinco testes aprovados; leitura ICS em tarefa FreeRTOS
+**Firmware mais recente testado em hardware:** v1.9.1 — exibição da AGENDA confirmada pelo usuário; demais testes da v1.9.1 pendentes
 
 > Documento central de acordos, especificações, decisões, evidências e pendências. A aprovação de sua publicação não significa validação técnica de todas as informações.
 
@@ -69,7 +69,7 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 
 ### AGENDA
 
-**Nova especificação aprovada para próxima versão (proposta v1.9.0, ainda não implementada/testada):** mostrar no máximo dois eventos, sem paginação. Se houver evento em andamento, destacá-lo e mostrar o próximo futuro; caso contrário, mostrar os dois próximos futuros. Abaixo, exibir `+N eventos hoje` para a quantidade de eventos restantes depois dos exibidos; não contar eventos encerrados nem os dois visíveis. Se houver somente um evento, mostrar um cartão; se não houver, indicar agenda livre. Recalcular com a passagem do tempo. Preservar HOME v1.8.1 sem ajustes e manter leitura ICS em segundo plano e retorno HOME por touch. Em caso de eventos simultâneos, a política de seleção ainda requer validação de uso.
+**Nova especificação implementada na v1.9.1, exibição confirmada pelo usuário:** mostrar no máximo dois eventos, sem paginação. Se houver evento em andamento, destacá-lo e mostrar o próximo futuro; caso contrário, mostrar os dois próximos futuros. Abaixo, exibir `+N eventos hoje` para a quantidade de eventos restantes depois dos exibidos; não contar eventos encerrados nem os dois visíveis. Se houver somente um evento, mostrar um cartão; se não houver, indicar agenda livre. Recalcular com a passagem do tempo. Preservar HOME v1.8.1 sem ajustes e manter leitura ICS em segundo plano e retorno HOME por touch. Em caso de eventos simultâneos, a política de seleção ainda requer validação de uso.
 
 - Na v1.8.1, quatro reuniões por página; substituição por visão de dois eventos aprovada para próxima implementação.
 - Destacar reunião em andamento apenas se a hora simulada/real estiver dentro do intervalo.
@@ -102,6 +102,8 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 | v1.7.4 CLIMA | Problema observado | Requisições de clima retornaram HTTP -1 repetidamente; causa não confirmada |
 | v1.8.0 | **Parcialmente validada em hardware (13/11/2026)** | HOME carregou; touch abriu AGENDA e CLIMA; retorno à HOME via Serial; SD e Wi-Fi OK; 770 VEVENT e seis reuniões corretas. Leitura ICS bloqueia touch/Serial por cerca de 2 min. Aviso GPIO36 INPUT_PULLUP. Sketch completo posteriormente entregue no chat. |
 | v1.8.1 | **Validada nos cinco testes informados pelo usuário (13/11/2026)** | Inicialização OK; touch durante leitura ICS OK; botões HOME OK; resultado da agenda OK; releitura OK. ICS em tarefa FreeRTOS; GPIO36 configurado como INPUT. Não há log detalhado de tempo, heap ou testes prolongados; não presumir que todos os cenários estão cobertos. |
+| v1.9.0 | **Erro de compilação relatado** | `AgendaView does not name a type`; versão substituída pela v1.9.1. |
+| v1.9.1 | **Exibição validada pelo usuário (13/11/2026)** | Usuário informou "esta mostrando corretamente" após receber o sketch integral corrigido. Confirma exibição desejada da AGENDA; não implica testes independentes de touch, releitura, virada de dia ou estabilidade prolongada nesta versão. |
 
 ### Reuniões confirmadas em 16/11/2026
 
@@ -148,7 +150,7 @@ Após validar: ajustar touch/layout; melhorar recorrências e fusos; reintegrar 
 ## 10. Itens ainda pendentes de aprovação técnica
 
 - [x] HOME v1.8.1 aprovada visualmente sem mudanças.
-- [x] Novo comportamento de AGENDA com dois eventos e contador aprovado como requisito; implementação e validação pendentes.
+- [x] Novo comportamento de AGENDA com dois eventos e contador aprovado como requisito; implementação concluída e exibição confirmada; testes adicionais pendentes.
 
 - [ ] Validar o conteúdo integral desta documentação como especificação oficial.
 - [ ] Confirmar a fidelidade da HOME com quatro cartões após teste visual.
