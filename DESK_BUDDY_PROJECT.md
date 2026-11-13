@@ -1,6 +1,6 @@
 # DESK BUDDY — Documento mestre do projeto
 
-**Revisão:** 1.2 — 13/11/2026  
+**Revisão:** 1.3 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
 **Último firmware com execução confirmada:** v1.8.1 (cinco testes aprovados pelo usuário)  
 **Firmware mais recente testado em hardware:** v1.8.1 — cinco testes aprovados; leitura ICS em tarefa FreeRTOS
@@ -9,7 +9,7 @@
 
 ## 1. Acordos obrigatórios
 
-1. **Todo firmware novo ou alterado deve ser entregue COMPLETO, diretamente no chat, em um único bloco de código copiável**, desde o primeiro `#include` até o fim de `loop()`. Não substituir por arquivo para download, patch ou trecho isolado.
+1. **Toda alteração que exija ajuste no código — inclusive correção de compilação, bug, mudança mínima ou adição de uma linha — deve ser feita pelo assistente e entregue como SKETCH INTEIRO, diretamente no chat, em um único bloco de código copiável**, desde o primeiro `#include` até o fechamento de `loop()`. **Nunca solicitar que o usuário localize, insira, substitua ou edite trechos manualmente; nunca entregar somente patch, fragmento, instrução de edição ou arquivo para download em substituição ao código integral.**
 2. Identificar a versão no código e na resposta; explicar alterações e testes.
 3. Manter `WIFI_SSID`, `WIFI_PASSWORD` e `ICS_URL` exclusivamente no `config_secrets.h` local. Nunca publicar segredos no chat nem no GitHub.
 4. Preservar funcionalidades validadas, salvo decisão explícita. Funcionalidade adiada não é descartada.
@@ -157,4 +157,4 @@ Após validar: ajustar touch/layout; melhorar recorrências e fusos; reintegrar 
 
 ---
 
-**Regra de ouro:** o documento orienta; **todo sketch completo e versionado é entregue diretamente no chat**; só o teste em hardware confirma funcionamento.
+**Regra de ouro:** qualquer mudança de código, por menor que seja, é realizada pelo assistente e entregue como **sketch integral e versionado, diretamente no chat, em um único bloco**. Não passar trechos ou instruções para edição manual. Só o teste em hardware confirma funcionamento.
