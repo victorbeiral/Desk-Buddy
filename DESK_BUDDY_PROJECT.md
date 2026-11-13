@@ -1,9 +1,9 @@
 # DESK BUDDY — Documento mestre do projeto
 
-**Revisão:** 1.0 — 13/11/2026  
+**Revisão:** 1.1 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
-**Último firmware com execução confirmada:** v1.7.4  
-**Firmware mais recente testado em hardware:** v1.8.0 — HOME, touch, AGENDA e CLIMA confirmados; bloqueio durante leitura ICS
+**Último firmware com execução confirmada:** v1.8.1 (cinco testes aprovados pelo usuário)  
+**Firmware mais recente testado em hardware:** v1.8.1 — cinco testes aprovados; leitura ICS em tarefa FreeRTOS
 
 > Documento central de acordos, especificações, decisões, evidências e pendências. A aprovação de sua publicação não significa validação técnica de todas as informações.
 
@@ -39,7 +39,7 @@ Painel de mesa baseado em ESP32 CYD 2,8", com HOME inicial e navegação por car
 | Backlight | GPIO 21 |
 | SD | ~2 GB, leitura e escrita testadas |
 | SD SPI | VSPI: SCK 18, MISO 19, MOSI 23, CS 5, 4 MHz |
-| Touch | XPT2046; pinos **propostos, não validados**: CLK 25, MOSI 32, MISO 39, CS 33, IRQ 36 |
+| Touch | XPT2046; pinos usados e funcionalmente testados para navegação: CLK 25, MOSI 32, MISO 39, CS 33, IRQ 36; calibração fina pendente |
 | Arduino | ESP32 core 3.3.12 observado; ESP32 Dev Module; Flash DIO 40 MHz; PSRAM off |
 | Serial | 115200 baud |
 | Fonte | NotoSansBold15.h local |
@@ -57,11 +57,11 @@ Desk_Buddy/
 
 No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O download temporário é verificado pelo início `BEGIN:VCALENDAR` antes da substituição. A URL publicada do Outlook é privada.
 
-**GitHub:** `victorbeiral/Desk-Buddy`, branch `main`, repositório **público** em 13/11/2026. Não publicar `config_secrets.h`, arquivos ICS reais, tokens, credenciais ou logs privados. Este documento não substitui o backup do sketch validado.
+**GitHub:** `victorbeiral/Desk-Buddy`, branch `main`, repositório **privado**, confirmado pela integração em 13/11/2026. Não publicar `config_secrets.h`, arquivos ICS reais, tokens, credenciais ou logs privados. Este documento não substitui o backup do sketch validado.
 
 ## 5. Interface e comportamento
 
-### HOME (v1.8.0, ainda não validada)
+### HOME (v1.8.1, navegação validada)
 - Resolução 320 × 240 paisagem; fundo azul-escuro; tipografia clara; destaques ciano, verde, amarelo e rosa.
 - Hora grande, data, identificação do sistema e status real de Wi-Fi.
 - Cartões AGENDA, CLIMA, +, +; toque abre a página correspondente.
@@ -98,6 +98,7 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 | v1.7.4 | **Última execução confirmada** | Simulação 16/11/2026 08:00; seis reuniões reais, cinco ocorrências geradas, três regras não suportadas; usuário confirmou horários corretos |
 | v1.7.4 CLIMA | Problema observado | Requisições de clima retornaram HTTP -1 repetidamente; causa não confirmada |
 | v1.8.0 | **Parcialmente validada em hardware (13/11/2026)** | HOME carregou; touch abriu AGENDA e CLIMA; retorno à HOME via Serial; SD e Wi-Fi OK; 770 VEVENT e seis reuniões corretas. Leitura ICS bloqueia touch/Serial por cerca de 2 min. Aviso GPIO36 INPUT_PULLUP. Sketch completo posteriormente entregue no chat. |
+| v1.8.1 | **Validada nos cinco testes informados pelo usuário (13/11/2026)** | Inicialização OK; touch durante leitura ICS OK; botões HOME OK; resultado da agenda OK; releitura OK. ICS em tarefa FreeRTOS; GPIO36 configurado como INPUT. Não há log detalhado de tempo, heap ou testes prolongados; não presumir que todos os cenários estão cobertos. |
 
 ### Reuniões confirmadas em 16/11/2026
 
@@ -110,9 +111,9 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 | 14:00 | 15:00 | Handoff Demandas Luiz |
 | 15:30 | 16:15 | Blackline import activities sync |
 
-Os títulos são dados de agenda; revisar sua permanência no documento caso a privacidade seja uma preocupação, especialmente por o repositório ser público.
+Os títulos são dados privados de agenda; repositório agora privado, mas evitar publicação ou compartilhamento indevido.
 
-## 8. Próximos testes — v1.8.0
+## 8. Validação v1.8.1 e próximos testes
 
 - [x] HOME aparece ao iniciar.
 - [ ] Hora/data e status Wi-Fi corretos.
@@ -121,12 +122,12 @@ Os títulos são dados de agenda; revisar sua permanência no documento caso a p
 - [ ] Paginação da agenda funciona.
 - [x] CLIMA abre placeholder, sem Open-Meteo (navegação confirmada; ausência de chamadas pelo código).
 - [ ] Ambos os cartões + abrem placeholders.
-- [ ] Retorno à HOME funciona.
+- [x] Retorno à HOME por touch funciona na v1.8.1.
 - [x] Touch responde nos cartões AGENDA e CLIMA; calibração fina e HOME por touch pendentes.
 - [ ] Wi-Fi, NTP, SD e download ICS continuam funcionais.
-- [ ] Sem resets ou travamentos na navegação.
+- [ ] Estabilidade prolongada sem resets ou travamentos (cinco testes funcionais OK, sem ensaio prolongado).
 
-**Problemas observados em 13/11/2026:** leitura ICS síncrona em duas passagens leva ~2 minutos e bloqueia a UI e comandos Serial; `pinMode(T_IRQ, INPUT_PULLUP)` no GPIO36 gera aviso por ausência de pull-up interno. **Próxima correção proposta v1.8.1:** leitura incremental/cooperativa ou tarefa independente, sem bloquear toque, com estado "Atualizando agenda..."; mudar GPIO36 para `INPUT`. Ainda não implementada nem validada.
+**Problemas da v1.8.0 corrigidos e testados na v1.8.1:** leitura ICS em tarefa FreeRTOS separada; touch e Serial continuam respondendo; indicador de atualização; retorno à HOME pelo toque superior e inferior; GPIO36 alterado para `INPUT`. O usuário marcou os cinco testes como OK. **Pendências:** calibração fina do touch, testes de estabilidade prolongada, paginação, cartões +, atualização HTTPS real e eventual concorrência entre download SD e outras tarefas.
 
 Após validar: ajustar touch/layout; melhorar recorrências e fusos; reintegrar CLIMA isoladamente; desenvolver novos cartões.
 
