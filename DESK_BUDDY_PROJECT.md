@@ -1,9 +1,9 @@
 # DESK BUDDY — Documento mestre do projeto
 
-**Revisão:** 1.4 — 13/11/2026  
+**Revisão:** 1.5 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
 **Último firmware com execução confirmada:** v1.8.1 (cinco testes aprovados pelo usuário)  
-**Firmware mais recente testado em hardware:** v1.9.1 — exibição da AGENDA confirmada pelo usuário; demais testes da v1.9.1 pendentes
+**Firmware mais recente testado em hardware:** v1.9.1 — exibição da AGENDA, touch e botões HOME confirmados pelo usuário; testes de releitura e estabilidade prolongada ainda pendentes
 
 > Documento central de acordos, especificações, decisões, evidências e pendências. A aprovação de sua publicação não significa validação técnica de todas as informações.
 
@@ -103,7 +103,7 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 | v1.8.0 | **Parcialmente validada em hardware (13/11/2026)** | HOME carregou; touch abriu AGENDA e CLIMA; retorno à HOME via Serial; SD e Wi-Fi OK; 770 VEVENT e seis reuniões corretas. Leitura ICS bloqueia touch/Serial por cerca de 2 min. Aviso GPIO36 INPUT_PULLUP. Sketch completo posteriormente entregue no chat. |
 | v1.8.1 | **Validada nos cinco testes informados pelo usuário (13/11/2026)** | Inicialização OK; touch durante leitura ICS OK; botões HOME OK; resultado da agenda OK; releitura OK. ICS em tarefa FreeRTOS; GPIO36 configurado como INPUT. Não há log detalhado de tempo, heap ou testes prolongados; não presumir que todos os cenários estão cobertos. |
 | v1.9.0 | **Erro de compilação relatado** | `AgendaView does not name a type`; versão substituída pela v1.9.1. |
-| v1.9.1 | **Exibição validada pelo usuário (13/11/2026)** | Usuário informou "esta mostrando corretamente" após receber o sketch integral corrigido. Confirma exibição desejada da AGENDA; não implica testes independentes de touch, releitura, virada de dia ou estabilidade prolongada nesta versão. |
+| v1.9.1 | **Exibição validada pelo usuário (13/11/2026)** | Usuário informou "esta mostrando corretamente" após receber o sketch integral corrigido e, quando perguntado se botões HOME e navegação por touch continuavam funcionando, respondeu "continuam". Exibição da AGENDA, touch e retorno HOME confirmados; releitura, virada de dia e estabilidade prolongada não foram revalidadas nesta versão. |
 
 ### Reuniões confirmadas em 16/11/2026
 
