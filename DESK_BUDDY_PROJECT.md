@@ -3,7 +3,7 @@
 **Revisão:** 1.0 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
 **Último firmware com execução confirmada:** v1.7.4  
-**Firmware mais recente entregue, sem validação em hardware:** v1.8.0
+**Firmware mais recente testado em hardware:** v1.8.0 — HOME, touch, AGENDA e CLIMA confirmados; bloqueio durante leitura ICS
 
 > Documento central de acordos, especificações, decisões, evidências e pendências. A aprovação de sua publicação não significa validação técnica de todas as informações.
 
@@ -97,7 +97,7 @@ No microSD, o calendário usa `/agenda.ics`, `/agenda.tmp` e `/agenda.bak`. O do
 | v1.7.3 | Validada em hardware | ICS 2.024.858 bytes; 770 VEVENT; 484 simples; 471 datas convertidas; 11 não suportadas; 0 inconsistências estruturais; 56 linhas truncadas |
 | v1.7.4 | **Última execução confirmada** | Simulação 16/11/2026 08:00; seis reuniões reais, cinco ocorrências geradas, três regras não suportadas; usuário confirmou horários corretos |
 | v1.7.4 CLIMA | Problema observado | Requisições de clima retornaram HTTP -1 repetidamente; causa não confirmada |
-| v1.8.0 | Entregue, NÃO validada | HOME, AGENDA, CLIMA placeholder, dois + e touch propostos; entrega por download contrariou acordo de código no chat |
+| v1.8.0 | **Parcialmente validada em hardware (13/11/2026)** | HOME carregou; touch abriu AGENDA e CLIMA; retorno à HOME via Serial; SD e Wi-Fi OK; 770 VEVENT e seis reuniões corretas. Leitura ICS bloqueia touch/Serial por cerca de 2 min. Aviso GPIO36 INPUT_PULLUP. Sketch completo posteriormente entregue no chat. |
 
 ### Reuniões confirmadas em 16/11/2026
 
@@ -114,17 +114,19 @@ Os títulos são dados de agenda; revisar sua permanência no documento caso a p
 
 ## 8. Próximos testes — v1.8.0
 
-- [ ] HOME aparece ao iniciar.
+- [x] HOME aparece ao iniciar.
 - [ ] Hora/data e status Wi-Fi corretos.
-- [ ] AGENDA abre e mostra reuniões reais.
-- [ ] Simulação exibe as seis reuniões confirmadas.
+- [x] AGENDA abre e mostra reuniões reais.
+- [x] Simulação exibe as seis reuniões confirmadas.
 - [ ] Paginação da agenda funciona.
-- [ ] CLIMA abre placeholder, sem Open-Meteo.
+- [x] CLIMA abre placeholder, sem Open-Meteo (navegação confirmada; ausência de chamadas pelo código).
 - [ ] Ambos os cartões + abrem placeholders.
 - [ ] Retorno à HOME funciona.
-- [ ] Touch calibrado e coordenadas corretas.
+- [x] Touch responde nos cartões AGENDA e CLIMA; calibração fina e HOME por touch pendentes.
 - [ ] Wi-Fi, NTP, SD e download ICS continuam funcionais.
 - [ ] Sem resets ou travamentos na navegação.
+
+**Problemas observados em 13/11/2026:** leitura ICS síncrona em duas passagens leva ~2 minutos e bloqueia a UI e comandos Serial; `pinMode(T_IRQ, INPUT_PULLUP)` no GPIO36 gera aviso por ausência de pull-up interno. **Próxima correção proposta v1.8.1:** leitura incremental/cooperativa ou tarefa independente, sem bloquear toque, com estado "Atualizando agenda..."; mudar GPIO36 para `INPUT`. Ainda não implementada nem validada.
 
 Após validar: ajustar touch/layout; melhorar recorrências e fusos; reintegrar CLIMA isoladamente; desenvolver novos cartões.
 
