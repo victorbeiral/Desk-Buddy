@@ -24,7 +24,7 @@
 | v1.8.0 | Parcialmente validada em hardware (13/11/2026) | HOME renderizada; touch abria AGENDA e CLIMA; retorno à HOME via Serial; SD/Wi-Fi OK, 770 VEVENT e seis reuniões corretas. Leitura ICS síncrona bloqueava touch e Serial por cerca de dois minutos. Aviso de GPIO36 INPUT_PULLUP. |
 | v1.8.1 | **Cinco testes funcionais aprovados pelo usuário (13/11/2026)** | ICS passou a tarefa FreeRTOS, interface não bloqueante, retorno HOME por touch, GPIO36 como INPUT. Inicialização OK; touch durante leitura OK; botões HOME OK; resultado da agenda OK; releitura OK. |
 | v1.9.0 | **Erro de compilação confirmado** | Compilador apontou `AgendaView does not name a type`; tipo personalizado e geração automática de protótipos Arduino foram identificados como causa provável. Não considerar essa versão validada. |
-| v1.9.1 | **Interface e Teste 01 de releitura validados parcialmente em hardware (13/11/2026)** | Substituição de `AgendaView` por `selectAgenda(time_t,int&,int&,int&,bool&)`; AGENDA com dois eventos, destaque de andamento e contador, sem paginação. Usuário confirmou “esta mostrando corretamente”, touch e botões HOME funcionando. **Teste 01: “tudo ok”** para releitura ICS local com comando `E`, touch durante a leitura, navegação HOME/CLIMA e agenda final. Download HTTPS, avanço automático do relógio, virada de dia e estabilidade prolongada ainda pendentes. |
+| v1.9.1 | **Interface, Testes 01 e 02 validados parcialmente em hardware (13/11/2026)** | Substituição de `AgendaView` por `selectAgenda(time_t,int&,int&,int&,bool&)`; AGENDA com dois eventos, destaque de andamento e contador, sem paginação. Usuário confirmou “esta mostrando corretamente”, touch e botões HOME funcionando. **Teste 01: “tudo ok”** para releitura ICS local com comando `E`, touch durante a leitura, navegação HOME/CLIMA e agenda final. **Teste 02: “tudo ok”** para hora real, atualização por minuto, AGENDA real e retorno ao modo simulado. Download HTTPS, virada de dia, troca entre eventos e estabilidade prolongada ainda pendentes. Foi solicitada melhoria de UX: manter dados visíveis durante releitura ICS; ainda não implementada. |
 
 **Referência atual de interface:** v1.9.1.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
@@ -60,7 +60,8 @@ Na regra introduzida na v1.9.1, a seleção às 08:00 deve mostrar os dois event
 | Resultado da agenda | **OK informado** | **OK: exibição informada** |
 | Releitura ICS | **OK informado** | **OK informado: Teste 01 com comando `E`** |
 | Download HTTPS real | Não confirmado como ensaio independente | **Pendente** |
-| Virada de dia/modo real | **Pendente** | **Pendente** |
+| Modo real, avanço por minuto e retorno à simulação | **Não registrado aqui** | **OK informado: Teste 02** |
+| Virada de dia e transição entre eventos | **Pendente** | **Pendente (não cobertos pelo Teste 02)** |
 | Calibração fina touch e placeholders + | **Pendente** | **Pendente** |
 | Tempo de execução prolongado, heap e resets | **Pendente** | **Pendente** |
 | Reintegração CLIMA completo | Adiada | **Adiada** |
@@ -93,12 +94,13 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 
 ## 6. Pendências abertas e plano de próxima validação
 
-- [ ] Confirmar hora, data, modo real e Wi-Fi após inicialização.
+- [x] Confirmar modo real, hora e data, mudança de minuto e retorno à simulação na v1.9.1 (**Teste 02, usuário: “tudo ok”**). Isso não comprova precisão prolongada de NTP nem virada de dia.
 - [x] Revalidar explicitamente releitura ICS **local** na v1.9.1 (Teste 01, comando `E`; usuário: “tudo ok”).
 - [x] Revalidar touch e navegação durante **releitura ICS local** na v1.9.1 (Teste 01, usuário: “tudo ok”).
 - [ ] Revalidar especificamente responsividade Serial durante operação e touch/Serial durante **download HTTPS real** na v1.9.1.
-- [ ] Testar troca do evento atual/próximo à medida que o relógio avança.
+- [ ] Testar **troca entre eventos** quando reunião começa/termina (não abrangida pela simples virada de minuto do Teste 02).
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
+- [ ] Implementar e validar **manutenção da AGENDA durante releitura/download ICS**: manter snapshot anterior, indicador `ICS...` amarelo no rodapé esquerdo, atualização atômica ao concluir e fallback sem perda do snapshot em caso de falha.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
 - [ ] Testar estabilidade prolongada e coletar heap/reset quando possível.
 - [ ] Corrigir/validar TLS com verificação de certificado antes de considerar o download seguro.
@@ -111,6 +113,16 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 **Procedimento solicitado:** na AGENDA, executar `E` pelo Monitor Serial (releitura do ICS armazenado no microSD); durante `ATUALIZANDO`, navegar por touch para HOME, CLIMA e AGENDA; após conclusão, conferir dois eventos, contador `+4 eventos hoje` e saída de processamento no Serial.
 
 **Resposta do usuário:** “teste 01 tudo ok”. **Conclusão:** aprovação conjunta dos itens solicitados no Teste 01: releitura ICS local, touch/navegação durante leitura e apresentação final da agenda. Não há logs anexados nem medições de duração/heap. Não extrapolar o resultado para o comando `I`, download HTTPS, virada de dia ou estabilidade prolongada.
+
+### Registro de teste — v1.9.1, Teste 02 (13/11/2026)
+
+**Procedimento solicitado:** acionar `R` no Serial; verificar HOME com horário real, virada de um minuto com atualização automática, apresentação da AGENDA do dia atual ou mensagem de agenda livre; retornar à simulação com `T` e confirmar os dois eventos e contador `+4 eventos hoje`.
+
+**Resposta do usuário:** “teste 2 tudo ok”. **Conclusão:** os quatro critérios solicitados foram aprovados. Não foi feito teste dedicado de troca de eventos em seu horário exato, virada de dia, download HTTPS ou estabilidade prolongada.
+
+### Nova melhoria solicitada após Teste 02 — ainda não implementada
+
+**Comportamento atual da v1.9.1, por inspeção do sketch entregue:** durante a releitura ICS, a AGENDA exibe `ATUALIZANDO` no lugar dos eventos; o processo reescreve a lista utilizada na renderização. **Requisito novo:** manter últimos eventos e contador visíveis, usar apenas `ICS...` amarelo no canto inferior esquerdo, manter dados estáveis até nova leitura terminar e trocar somente com sucesso. Classificação: **problema de UX/arquitetura confirmado por leitura de código**; **risco dependente de testes:** uso de RAM, sincronização FreeRTOS, troca de dia, falha de download. A v1.9.1 continua sem essa melhoria; próxima entrega deverá implementá-la em sketch integral e passar pela checklist.
 
 ## 7. Registro de documentação
 
