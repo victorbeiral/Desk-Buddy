@@ -25,8 +25,9 @@
 | v1.8.1 | **Cinco testes funcionais aprovados pelo usuário (13/11/2026)** | ICS passou a tarefa FreeRTOS, interface não bloqueante, retorno HOME por touch, GPIO36 como INPUT. Inicialização OK; touch durante leitura OK; botões HOME OK; resultado da agenda OK; releitura OK. |
 | v1.9.0 | **Erro de compilação confirmado** | Compilador apontou `AgendaView does not name a type`; tipo personalizado e geração automática de protótipos Arduino foram identificados como causa provável. Não considerar essa versão validada. |
 | v1.9.1 | **Interface, Testes 01 e 02 validados parcialmente em hardware (13/11/2026)** | Substituição de `AgendaView` por `selectAgenda(time_t,int&,int&,int&,bool&)`; AGENDA com dois eventos, destaque de andamento e contador, sem paginação. Usuário confirmou “esta mostrando corretamente”, touch e botões HOME funcionando. **Teste 01: “tudo ok”** para releitura ICS local com comando `E`, touch durante a leitura, navegação HOME/CLIMA e agenda final. **Teste 02: “tudo ok”** para hora real, atualização por minuto, AGENDA real e retorno ao modo simulado. Download HTTPS, virada de dia, troca entre eventos e estabilidade prolongada ainda pendentes. Foi solicitada melhoria de UX: manter dados visíveis durante releitura ICS; ainda não implementada. |
+| v1.9.2 | **Sketch preparado para entrega; compilação real e testes CYD pendentes (13/11/2026)** | Scanner ICS em buffers de 4096 bytes, primeira passagem seletiva para UID/RECURRENCE-ID, medições `[PERF]` por passagem (tempo, SD, bytes, blocos, linhas), dois bancos de eventos com troca após sucesso, manutenção da AGENDA visível e indicador único `Atualização em andamento`. Mantém HOME, touch, retorno HOME, comandos, simulação e parser parcial. Verificação de sintaxe C++ com bibliotecas simuladas aprovada sem avisos; **não equivale a compilação Arduino/ESP32 nem ensaio em hardware**. |
 
-**Referência atual de interface:** v1.9.1.
+**Referência atual validada em hardware para a interface:** v1.9.1. **v1.9.2:** entregue para nova validação, sem confirmação de compilação ou hardware.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
 **Estado do `.ino` no GitHub:** o firmware mais recente foi entregue integralmente no chat; **não presumir arquivo de firmware commitado no repositório**.
 
@@ -100,7 +101,7 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 - [ ] Revalidar especificamente responsividade Serial durante operação e touch/Serial durante **download HTTPS real** na v1.9.1.
 - [ ] Testar **troca entre eventos** quando reunião começa/termina (não abrangida pela simples virada de minuto do Teste 02).
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
-- [ ] Implementar e validar **manutenção da AGENDA durante releitura/download ICS**: manter snapshot anterior, indicador `Atualização em andamento` em amarelo no rodapé, atualização atômica ao concluir e fallback sem perda do snapshot em caso de falha.
+- [ ] **Validar no CYD a implementação v1.9.2 de manutenção da AGENDA durante releitura/download ICS**: manter snapshot anterior, indicador `Atualização em andamento` em amarelo no rodapé, atualização atômica ao concluir e fallback sem perda do snapshot em caso de falha.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
 - [ ] Testar estabilidade prolongada e coletar heap/reset quando possível.
 - [ ] Corrigir/validar TLS com verificação de certificado antes de considerar o download seguro.
@@ -123,6 +124,16 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 ### Nova melhoria solicitada após Teste 02 — ainda não implementada
 
 **Comportamento atual da v1.9.1, por inspeção do sketch entregue:** durante a releitura ICS, a AGENDA exibe `ATUALIZANDO` no lugar dos eventos; o processo reescreve a lista utilizada na renderização. **Requisito novo:** manter últimos eventos e contador visíveis, usar apenas `Atualização em andamento` em amarelo no rodapé, manter dados estáveis até nova leitura terminar e trocar somente com sucesso. Classificação: **problema de UX/arquitetura confirmado por leitura de código**; **risco dependente de testes:** uso de RAM, sincronização FreeRTOS, troca de dia, falha de download. A v1.9.1 continua sem essa melhoria; próxima entrega deverá implementá-la em sketch integral e passar pela checklist. **Decisão posterior:** remover a indicação redundante `ICS...` e apresentar somente `Atualização em andamento` em amarelo no rodapé.
+
+### Preparação da v1.9.2 — revisão pré-entrega (13/11/2026)
+
+**O que foi alterado no sketch:** leitura SD em blocos de 4 KB; primeira passagem apenas para exceções de recorrência; medidas de tempo total e tempo de leitura em cada passagem; duas listas independentes de eventos (exibida e em processamento), publicadas por troca após sucesso; indicador único `Atualização em andamento` no rodapé da AGENDA; preservação da cópia anterior em caso de falha; seções numeradas 01–11 e protótipos explícitos.
+
+**Problema confirmado detectado e corrigido na revisão:** o valor padrão do parâmetro `debug` de `touchRead` havia sido repetido no protótipo e na implementação, gerando erro de sintaxe C++; removido da implementação. **Verificação executada:** compilação somente de sintaxe C++ com cabeçalhos simulados, concluída sem erros/avisos; **não foi executada compilação no Arduino ESP32 3.3.12**.
+
+**Riscos ainda dependentes de teste:** desempenho real no microSD, RAM/heap em execução e tarefas simultâneas, fidelidade dos seis eventos e contador, caracteres acentuados no TFT, renderização durante download, SD/HTTPS real, estabilidade e troca de dia. Problema de segurança TLS com `setInsecure()` segue conhecido e não corrigido nesta otimização.
+
+**Medições necessárias:** coletar linhas `[PERF]` das passagens 1/2 e operação total, comparar com cerca de 120 segundos da v1.9.1, registrar contagem de seis reuniões e testar touch HOME durante a releitura.
 
 ## 7. Registro de documentação
 
