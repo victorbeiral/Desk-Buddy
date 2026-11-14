@@ -1,7 +1,7 @@
 # Desk Buddy — Especificação funcional e técnica
 
 **Base documental:** reorganização do documento mestre rev. 1.6, em 13/11/2026.
-**Referência atual de interface:** v1.9.1 (AGENDA, touch e retorno HOME confirmados pelo usuário).
+**Referência funcional mais recente confirmada pelo usuário:** v1.9.2.1 (AGENDA preservada durante releitura, indicador visível com problema de caracteres e navegação touch). **v1.9.2.2:** ajuste visual entregue, pendente de compilação e validação no CYD.
 **Estado:** especificação consolidada como referência de trabalho; revisão integral do conteúdo ainda pendente de aprovação.
 **Escopo:** descrever **como o sistema deve funcionar**. Motivações ficam em [DECISOES.md](DECISOES.md); evidências de testes em [VERSOES.md](VERSOES.md).
 
@@ -15,7 +15,7 @@ Desk Buddy é um painel de mesa com ESP32 CYD 2,8", display touchscreen, conecti
 - **AGENDA:** calendário real Outlook, com visualização inteligente de até dois eventos e contador, sem paginação.
 - **CLIMA:** apenas tela de placeholder “EM BREVE”, sem consultas ao serviço meteorológico na linha atual de firmware.
 - **Cartões +:** reservados para módulos futuros; telas de placeholder.
-- **Retorno à HOME:** por áreas touch superior e inferior das telas internas; comandos Serial preservados para diagnóstico.
+- **Retorno à HOME:** na **AGENDA**, apenas o botão inferior (tela v1.9.2.2, ainda a validar); nas telas placeholder, manter as áreas superior e inferior já existentes. Comandos Serial preservados para diagnóstico.
 - **Expansão:** módulos podem ser desenvolvidos isoladamente e reunidos em uma etapa posterior de integração. O módulo de monitoramento OpenAI foi discutido como **proposta**, não como requisito aprovado ou implementado.
 
 ## 2. Hardware de referência — variante exata
@@ -50,7 +50,7 @@ A navegação por touch e o retorno à HOME foram confirmados na v1.9.1. **Calib
 - Resolução 320 × 240, fundo azul-escuro, tipografia clara, destaques ciano, verde, amarelo e rosa.
 - Relógio em destaque, data, identificação Desk Buddy e status real da conexão Wi-Fi.
 - Quatro cartões: AGENDA e CLIMA na primeira linha, + e + na segunda.
-- Toque no cartão abre a tela correspondente; nas telas internas há retorno para HOME.
+- Toque no cartão abre a tela correspondente; na AGENDA, retorno à HOME exclusivamente pelo botão inferior a partir da v1.9.2.2 (pendente de teste no CYD). Nas demais telas internas, comportamento anterior preservado.
 - Preservar o layout visual aprovado. Fidelidade de fontes, distribuição e áreas de toque pode exigir inspeção diretamente no equipamento.
 
 ## 4. Comportamento da AGENDA
@@ -66,7 +66,7 @@ A AGENDA deve priorizar **o que está acontecendo agora** ou **o próximo compro
 7. Atualizar a seleção quando o relógio avança (modo real); a simulação de teste usa horário fixado até mudança explícita.
 8. Mostrar horários e títulos reais; truncar somente **visualmente** os títulos longos.
 9. Preservar retorno HOME e operação de touch enquanto o calendário é processado.
-10. **Comportamento implementado no sketch v1.9.2, pendente de compilação real e teste no CYD:** durante releitura ou download ICS, **manter na AGENDA os últimos dois eventos e contador válidos já apresentados**; sinalizar a atualização somente com `Atualização em andamento` **em amarelo no rodapé**, sem substituir a AGENDA inteira pela tela `ATUALIZANDO`.
+10. **Comportamento implementado e visualmente confirmado na v1.9.2.1:** durante releitura ou download ICS, **manter na AGENDA os últimos dois eventos e contador válidos já apresentados**; sinalizar a atualização com um único texto amarelo no rodapé; a v1.9.2.2 usa **`Atualizando agenda`** para evitar problemas de fonte/acentuação e largura, sem substituir a AGENDA inteira pela tela `ATUALIZANDO`.
 11. Manter o conjunto de eventos exibido estável enquanto a nova lista é processada em segundo plano; somente substituir a agenda publicada quando o novo processamento concluir com sucesso. Em caso de falha, preservar os últimos dados válidos e sinalizar o erro sem apresentar informações parciais como se fossem atualizadas.
 12. Se ainda não existir agenda válida após a inicialização, permitir mensagem de carregamento. Na virada de dia, evitar apresentar agenda do dia anterior como agenda do dia atual; esta situação exige verificação específica.
 13. Não fabricar eventos ou alterar os dados da fonte ICS.
@@ -138,7 +138,7 @@ Variáveis privadas mantidas fora do sketch público: `WIFI_SSID`, `WIFI_PASSWOR
 - HOME inicial, relógio/data/Wi-Fi corretos, cartões sem regressão visual.
 - Touch permite abrir AGENDA, CLIMA e os placeholders, além de voltar à HOME.
 - Leitura/atualização ICS não bloqueia a navegação nem o monitor Serial.
-- **Na implementação proposta v1.9.2, pendente de validação no CYD:** a releitura não oculta eventos já carregados; `Atualização em andamento` aparece em amarelo no rodapé e desaparece no fim; a interface usa snapshot consistente, sem concorrência com a lista em construção.
+- **v1.9.2.1 validada visualmente pelo usuário:** a releitura não oculta eventos nem contador; o indicador amarelo aparece no rodapé, porém seu texto com acentuação foi exibido incorretamente. **v1.9.2.2 (pendente de validação):** mostrar `Atualizando agenda` completo no rodapé, remover HOME superior somente da AGENDA e preservar HOME inferior e snapshot consistente.
 - Seis compromissos conhecidos do cenário de teste preservados; tela mostra somente os dois prioritários e contador correto.
 - Releitura/atualização de ICS, mudança de dia e modo real merecem revalidação por versão.
 - Sem corrupção de microSD, travamento, artefatos gráficos persistentes ou reset inesperado em uso prolongado.
