@@ -26,7 +26,9 @@
 | v1.9.0 | **Erro de compilação confirmado** | Compilador apontou `AgendaView does not name a type`; tipo personalizado e geração automática de protótipos Arduino foram identificados como causa provável. Não considerar essa versão validada. |
 | v1.9.1 | **Interface, Testes 01 e 02 validados parcialmente em hardware (13/11/2026)** | Substituição de `AgendaView` por `selectAgenda(time_t,int&,int&,int&,bool&)`; AGENDA com dois eventos, destaque de andamento e contador, sem paginação. Usuário confirmou “esta mostrando corretamente”, touch e botões HOME funcionando. **Teste 01: “tudo ok”** para releitura ICS local com comando `E`, touch durante a leitura, navegação HOME/CLIMA e agenda final. **Teste 02: “tudo ok”** para hora real, atualização por minuto, AGENDA real e retorno ao modo simulado. Download HTTPS, virada de dia, troca entre eventos e estabilidade prolongada ainda pendentes. Foi solicitada melhoria de UX: manter dados visíveis durante releitura ICS; ainda não implementada. |
 | v1.9.2 | **Erro de compilação relatado (13/11/2026)** | Scanner ICS em buffers de 4096 bytes, primeira passagem seletiva para UID/RECURRENCE-ID, medições `[PERF]` por passagem (tempo, SD, bytes, blocos, linhas), dois bancos de eventos com troca após sucesso, manutenção da AGENDA visível e indicador único `Atualização em andamento`. Mantém HOME, touch, retorno HOME, comandos, simulação e parser parcial. Verificação de sintaxe C++ com bibliotecas simuladas não detectou conflito envolvendo a função `dim()`. Arduino IDE ESP32 3.3.12 apresentou erro `'int dim(int, int)' was declared 'extern' and later 'static'`; versão substituída pela v1.9.2.1. |
-| v1.9.2.1 | **Compilação e execução no CYD confirmadas por logs; processamento ICS e touch durante releitura validados parcialmente (13/11/2026)** | Corrigido conflito de `dim()` para `daysInMonth()`. Dois ciclos locais ICS: 12.454 e 12.698 s; ambos `result=OK`, 770 VEVENT, 53 séries, 187 exceções, seis reuniões, visão `+4 eventos hoje`. Logs de touch durante a releitura comprovam atendimento e retorno HOME. Indicador amarelo na tela, download HTTPS e estabilidade prolongada ainda não confirmados especificamente. |
+| v1.9.2.1 | **Compilação/execução, desempenho ICS e preservação visual da AGENDA confirmados no CYD (13/11/2026)** | Corrigido conflito de `dim()` para `daysInMonth()`. Dois ciclos locais ICS: 12.454 e 12.698 s; ambos `result=OK`, 770 VEVENT, 53 séries, 187 exceções, seis reuniões, visão `+4 eventos hoje`. Logs de touch durante a releitura comprovam atendimento e retorno HOME. Indicador amarelo e preservação visual dos eventos **confirmados pelo usuário** durante releitura, porém mensagem do indicador apresentou renderização incorreta (`Atualizao...`). Download HTTPS e estabilidade prolongada pendentes. |
+
+| v1.9.2.2 | **Ajuste de UI entregue; compilação Arduino e validação no CYD pendentes (13/11/2026)** | AGENDA: remove apenas o botão HOME superior e desativa sua área touch; mantém retorno HOME inferior. Mensagem amarela substituída por `Atualizando agenda`, evitando caracteres acentuados que não renderizaram corretamente no TFT e cabendo antes do botão inferior. Nenhuma mudança na leitura ICS, pinagem, Wi-Fi, memória ou algoritmo dos eventos. Revisão estática e C++17 com interfaces simuladas concluídas sem erros; falta compilação real/hardware. |
 
 **Referência atual para processamento ICS com medição no CYD:** v1.9.2.1 (execução e resultados confirmados por logs). **Referência de interface visual aprovada anteriormente:** v1.9.1. **v1.9.2:** erro de compilação informado.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
@@ -102,7 +104,8 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 - [ ] Revalidar especificamente responsividade Serial durante operação e touch/Serial durante **download HTTPS real** na v1.9.1.
 - [ ] Testar **troca entre eventos** quando reunião começa/termina (não abrangida pela simples virada de minuto do Teste 02).
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
-- [ ] **Confirmar visualmente na v1.9.2.1** que os dois eventos e o contador permanecem na AGENDA durante a releitura local, com indicador único `Atualização em andamento` em amarelo; logs já confirmam leitura, contagem e touch, mas não a aparência do display.
+- [x] **Preservação visual v1.9.2.1:** usuário confirmou que eventos/contador permanecem visíveis com indicador amarelo durante releitura; observou erro de renderização da frase acentuada.
+- [ ] **Validar visual e touch v1.9.2.2:** mensagem `Atualizando agenda` inteiramente legível, somente botão HOME inferior visível/ativo na AGENDA, touch da área superior sem navegar, e indicadores sem colisão.
 - [ ] Testar especificamente atualização por HTTPS, falha do download e preservação do snapshot no CYD.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
 - [ ] Testar estabilidade prolongada e coletar heap/reset quando possível.
@@ -148,11 +151,19 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 
 Nos dois ciclos: **2.024.858 bytes por passagem**, 495 blocos por passagem, 18.837 linhas por passagem, 56 linhas truncadas, 770 VEVENT, 53 séries, 187 exceções, 5 ocorrências geradas, 3 regras e 11 datas não suportadas, **6 reuniões armazenadas**. Visão da agenda: primeiro índice 0, segundo índice 1, `+4 eventos hoje`, sem alteração dos horários conhecidos.
 
-**Touch:** foram registrados toques durante a segunda leitura, inclusive retorno HOME (toque na AGENDA seguido de registro na HOME). **Não afirmar ainda** que o texto amarelo `Atualização em andamento` foi visualmente conferido, pois não houve foto/confirmação explícita.
+**Touch:** foram registrados toques durante a segunda leitura, inclusive retorno HOME (toque na AGENDA seguido de registro na HOME). **Confirmação posterior do usuário:** eventos e contador permaneceram visíveis e o indicador amarelo apareceu conforme esperado; problema: a mensagem com caracteres acentuados apareceu truncada/corrompida (`Atualizao...`).
 
 **Interpretação:** comparação aproximada com ~120 s anteriores aponta ~90% de redução, cerca de 9,5 vezes mais rápido; o tempo antigo era estimado, não medido com a instrumentação atual. Na releitura, SD responde por 9.628 ms dos 12.698 ms (~75,8%); próxima estratégia de desempenho mais promissora é evitar leituras repetidas via cache validado, sem aumentar velocidade SPI antes de testes.
 
 **Pendências:** confirmar preservação visual dos eventos/contador e único indicador amarelo durante releitura; realizar download HTTPS; observar estabilidade, heap sob carga, travessia de dia e limites do parser.
+
+### Confirmação visual v1.9.2.1 e correção v1.9.2.2 — 13/11/2026
+
+**Relato do usuário:** durante o comando de releitura ICS, os eventos e o contador permaneceram visíveis e apareceu um único indicador amarelo no rodapé, como solicitado. O texto `Atualização em andamento` foi exibido com falha de caracteres (`Atualizao...`). Pediu remover o botão HOME superior, mantendo o inferior.
+
+**Falha confirmada:** mensagem de estado exibida incorretamente; **causa técnica provável, não comprovada isoladamente:** suporte incompleto a UTF-8/acento na fonte e/ou largura disponível. **Correção implementada na v1.9.2.2:** indicador `Atualizando agenda` (frase correta, sem acentos e mais curta) usando fonte bitmap 2 com largura máxima disponível; botão HOME superior removido apenas da AGENDA e antiga área de toque desabilitada, preservando o inferior. Outras telas, ICS e HOME principal inalterados.
+
+**Pré-validação:** comparação do diff com v1.9.2.1 e verificação C++17 com cabeçalhos simulados (`-Wall -Wextra -Werror -fsyntax-only`) concluídas sem erros; verificações de 11 seções, protótipos, pinagem touch, SD, buffers, seleção de tela e botão inferior. **Compilação real no Arduino ESP32 3.3.12 e teste de display/touch ainda pendentes**.
 
 ### Preparação da v1.9.2 — revisão pré-entrega (13/11/2026)
 
