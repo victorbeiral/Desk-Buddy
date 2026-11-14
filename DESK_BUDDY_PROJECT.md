@@ -1,8 +1,8 @@
 # Desk Buddy — Índice do projeto
 
-**Revisão documental:** 1.7 — 13/11/2026
+**Revisão documental:** 1.8 — 13/11/2026
 **Status:** REFERÊNCIA DE TRABALHO — PENDENTE DE VALIDAÇÃO INTEGRAL DO CONTEÚDO
-**Firmware de interface mais recente confirmado pelo usuário:** v1.9.1 (AGENDA, touch e botões HOME). **Novo sketch:** v1.9.2.1, correção do erro de compilação v1.9.2, ainda não validado na Arduino IDE/CYD.
+**Firmware mais recente executado no CYD:** v1.9.2.1 — dois ciclos de ICS local em 12,454 e 12,698 s, seis reuniões e touch durante releitura comprovados por logs. **Confirmação visual do indicador amarelo pendente.**
 **Último conjunto completo de cinco testes funcionais informado:** v1.8.1.
 
 > Este arquivo é agora um **índice**, não mais o repositório de todas as informações. A divisão documental não altera firmware, hardware nem validações previamente obtidas.
@@ -17,7 +17,7 @@
 
 ## Estado atual do desenvolvimento
 
-- **Foco do ciclo:** HOME + AGENDA; v1.9.1 validada nos Testes 01 e 02, v1.9.2 apresentou conflito de compilação em `dim()`; v1.9.2.1 corrige o identificador, aguardando compilação para avaliar desempenho ICS, atualização não bloqueante e indicador único. HOME sem mudanças visuais; agenda com dois eventos e contador.
+- **Foco do ciclo:** HOME + AGENDA; v1.9.1 validada nos Testes 01 e 02, v1.9.2 apresentou conflito de compilação em `dim()`; v1.9.2.1 corrigiu o identificador e teve a leitura ICS em blocos executada no CYD, com grande redução de tempo; falta confirmar visualmente indicador e permanência dos cartões durante atualização. HOME sem mudanças visuais; agenda com dois eventos e contador.
 - **CLIMA:** placeholder, implementação completa adiada, não descartada.
 - **Objetivo posterior:** integrar todos os módulos parcialmente validados e realizar nova revisão de regressão, RAM, SPI e interface.
 - **Novo padrão de código:** seções numeradas 01–11 e protótipos explícitos; aplicados na preparação da v1.9.2.
@@ -38,4 +38,4 @@
 
 A versão completa deste documento até a **revisão 1.6 (13/11/2026)** segue disponível no **histórico Git**. Sua informação relevante foi distribuída entre os três arquivos acima. A autorização para reorganizar os arquivos **não equivale** a validar integralmente a exatidão técnica de cada registro.
 
-**Próxima ação técnica:** continuar a validação do firmware v1.9.1 sem reescrever ou reorganizar o código apenas por causa desta migração documental.
+**Próxima ação técnica:** concluir o teste visual do indicador de atualização da v1.9.2.1, preservar os resultados de desempenho e só então decidir sobre cache diário ou novas otimizações.
