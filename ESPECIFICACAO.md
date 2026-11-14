@@ -66,7 +66,7 @@ A AGENDA deve priorizar **o que está acontecendo agora** ou **o próximo compro
 7. Atualizar a seleção quando o relógio avança (modo real); a simulação de teste usa horário fixado até mudança explícita.
 8. Mostrar horários e títulos reais; truncar somente **visualmente** os títulos longos.
 9. Preservar retorno HOME e operação de touch enquanto o calendário é processado.
-10. **Novo comportamento solicitado para próxima versão (ainda não implementado na v1.9.1):** durante releitura ou download ICS, **manter na AGENDA os últimos dois eventos e contador válidos já apresentados**; sinalizar a atualização somente com `Atualização em andamento` **em amarelo no rodapé**, sem substituir a AGENDA inteira pela tela `ATUALIZANDO`.
+10. **Comportamento implementado no sketch v1.9.2, pendente de compilação real e teste no CYD:** durante releitura ou download ICS, **manter na AGENDA os últimos dois eventos e contador válidos já apresentados**; sinalizar a atualização somente com `Atualização em andamento` **em amarelo no rodapé**, sem substituir a AGENDA inteira pela tela `ATUALIZANDO`.
 11. Manter o conjunto de eventos exibido estável enquanto a nova lista é processada em segundo plano; somente substituir a agenda publicada quando o novo processamento concluir com sucesso. Em caso de falha, preservar os últimos dados válidos e sinalizar o erro sem apresentar informações parciais como se fossem atualizadas.
 12. Se ainda não existir agenda válida após a inicialização, permitir mensagem de carregamento. Na virada de dia, evitar apresentar agenda do dia anterior como agenda do dia atual; esta situação exige verificação específica.
 13. Não fabricar eventos ou alterar os dados da fonte ICS.
@@ -138,7 +138,7 @@ Variáveis privadas mantidas fora do sketch público: `WIFI_SSID`, `WIFI_PASSWOR
 - HOME inicial, relógio/data/Wi-Fi corretos, cartões sem regressão visual.
 - Touch permite abrir AGENDA, CLIMA e os placeholders, além de voltar à HOME.
 - Leitura/atualização ICS não bloqueia a navegação nem o monitor Serial.
-- **Após implementar a melhoria solicitada:** a releitura não oculta eventos já carregados; `Atualização em andamento` aparece em amarelo no rodapé e desaparece no fim; a interface usa snapshot consistente, sem concorrência com a lista em construção.
+- **Na implementação proposta v1.9.2, pendente de validação no CYD:** a releitura não oculta eventos já carregados; `Atualização em andamento` aparece em amarelo no rodapé e desaparece no fim; a interface usa snapshot consistente, sem concorrência com a lista em construção.
 - Seis compromissos conhecidos do cenário de teste preservados; tela mostra somente os dois prioritários e contador correto.
 - Releitura/atualização de ICS, mudança de dia e modo real merecem revalidação por versão.
 - Sem corrupção de microSD, travamento, artefatos gráficos persistentes ou reset inesperado em uso prolongado.
