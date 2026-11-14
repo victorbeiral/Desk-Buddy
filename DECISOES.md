@@ -73,7 +73,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 
 - [ ] **Pinos:** TFT/backlight/touch/SD, modos INPUT/OUTPUT, pinos só entrada, pinos de boot e conflitos de GPIO.
 - [ ] **Variante exata CYD:** ESP32-2432S028, ILI9341, XPT2046, orientação e peculiaridades do equipamento confirmado.
-- [ ] **Bibliotecas/core:** includes disponíveis, APIs compatíveis, configuração TFT_eSPI, core ESP32 3.3.12 e seleção de SD.
+- [ ] **Bibliotecas/core:** includes disponíveis, APIs compatíveis, configuração TFT_eSPI, core ESP32 3.3.12 e seleção de SD. Conferir **argumentos padrão apenas uma vez**, preferencialmente nos protótipos.
 - [ ] **RAM e pilhas:** heap livre, sprite 320 × 240 × 8 bits, Strings, buffers ICS, stack FreeRTOS, risco de fragmentação.
 - [ ] **Bloqueios:** HTTPS, Wi-Fi, leitura de SD/ICS, delays/loops, tempo de resposta touch e Serial.
 - [ ] **Touch:** XPT2046, IRQ36 INPUT, calibração, debounce, transformação X/Y, zonas dos cartões e retorno HOME.
@@ -104,7 +104,8 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 | R-005 | v1.7.4 CLIMA: HTTP −1 em chamadas meteorológicas | Antes de reintegrar CLIMA, separar erro de rede/TLS/endpoint de falha do display/agenda; testar retorno HTTP. |
 | R-006 | Interface CYD compartilha recursos limitados | Rever RAM, CS/SPI e renderização sempre que novos módulos forem integrados. |
 | R-007 | HTTPS conhecido com `setInsecure()` | Não confundir download funcional com conexão autenticada por certificado TLS. |
-| R-008 | v1.9.1: durante releitura ICS, `drawAgenda()` apresenta carregamento no lugar dos eventos e a tarefa reescreve a lista | Não remover apenas a tela de carregamento; proteger o conjunto publicado por snapshot separado para que touch/renderização não consumam lista em atualização. Solicitação de melhoria pendente de implementação. |
+| R-009 | Pré-validação v1.9.2: argumento padrão declarado simultaneamente no protótipo e na definição de `touchRead` | Declarar valores padrão apenas no protótipo; revisão de sintaxe C++ com interfaces simuladas detectou o erro e a correção passou sem avisos. Compilação real Arduino ainda pendente. |
+| R-008 | v1.9.1: durante releitura ICS, `drawAgenda()` apresenta carregamento no lugar dos eventos e a tarefa reescreve a lista | Na v1.9.2 foi preparada separação em dois buffers de eventos e troca somente ao completar; **compilação Arduino e teste no CYD pendentes**. |
 
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
