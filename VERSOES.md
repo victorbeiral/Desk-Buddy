@@ -100,7 +100,7 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 - [ ] Revalidar especificamente responsividade Serial durante operação e touch/Serial durante **download HTTPS real** na v1.9.1.
 - [ ] Testar **troca entre eventos** quando reunião começa/termina (não abrangida pela simples virada de minuto do Teste 02).
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
-- [ ] Implementar e validar **manutenção da AGENDA durante releitura/download ICS**: manter snapshot anterior, indicador `ICS...` amarelo no rodapé esquerdo, atualização atômica ao concluir e fallback sem perda do snapshot em caso de falha.
+- [ ] Implementar e validar **manutenção da AGENDA durante releitura/download ICS**: manter snapshot anterior, indicador `Atualização em andamento` em amarelo no rodapé, atualização atômica ao concluir e fallback sem perda do snapshot em caso de falha.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
 - [ ] Testar estabilidade prolongada e coletar heap/reset quando possível.
 - [ ] Corrigir/validar TLS com verificação de certificado antes de considerar o download seguro.
@@ -122,7 +122,7 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 
 ### Nova melhoria solicitada após Teste 02 — ainda não implementada
 
-**Comportamento atual da v1.9.1, por inspeção do sketch entregue:** durante a releitura ICS, a AGENDA exibe `ATUALIZANDO` no lugar dos eventos; o processo reescreve a lista utilizada na renderização. **Requisito novo:** manter últimos eventos e contador visíveis, usar apenas `ICS...` amarelo no canto inferior esquerdo, manter dados estáveis até nova leitura terminar e trocar somente com sucesso. Classificação: **problema de UX/arquitetura confirmado por leitura de código**; **risco dependente de testes:** uso de RAM, sincronização FreeRTOS, troca de dia, falha de download. A v1.9.1 continua sem essa melhoria; próxima entrega deverá implementá-la em sketch integral e passar pela checklist.
+**Comportamento atual da v1.9.1, por inspeção do sketch entregue:** durante a releitura ICS, a AGENDA exibe `ATUALIZANDO` no lugar dos eventos; o processo reescreve a lista utilizada na renderização. **Requisito novo:** manter últimos eventos e contador visíveis, usar apenas `Atualização em andamento` em amarelo no rodapé, manter dados estáveis até nova leitura terminar e trocar somente com sucesso. Classificação: **problema de UX/arquitetura confirmado por leitura de código**; **risco dependente de testes:** uso de RAM, sincronização FreeRTOS, troca de dia, falha de download. A v1.9.1 continua sem essa melhoria; próxima entrega deverá implementá-la em sketch integral e passar pela checklist. **Decisão posterior:** remover a indicação redundante `ICS...` e apresentar somente `Atualização em andamento` em amarelo no rodapé.
 
 ## 7. Registro de documentação
 
