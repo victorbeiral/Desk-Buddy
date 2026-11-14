@@ -1,6 +1,6 @@
 # DESK BUDDY — Documento mestre do projeto
 
-**Revisão:** 1.5 — 13/11/2026  
+**Revisão:** 1.6 — 13/11/2026  
 **Status:** REFERÊNCIA INICIAL — PENDENTE DE VALIDAÇÃO DO CONTEÚDO  
 **Último firmware com execução confirmada:** v1.8.1 (cinco testes aprovados pelo usuário)  
 **Firmware mais recente testado em hardware:** v1.9.1 — exibição da AGENDA, touch e botões HOME confirmados pelo usuário; testes de releitura e estabilidade prolongada ainda pendentes
@@ -160,3 +160,29 @@ Após validar: ajustar touch/layout; melhorar recorrências e fusos; reintegrar 
 ---
 
 **Regra de ouro:** qualquer mudança de código, por menor que seja, é realizada pelo assistente e entregue como **sketch integral e versionado, diretamente no chat, em um único bloco**. Não passar trechos ou instruções para edição manual. Só o teste em hardware confirma funcionamento.
+
+### Revisão geral obrigatória antes de entregar qualquer novo firmware
+
+Sempre que um novo código ou uma nova versão do firmware for gerada, o assistente deve executar uma **revisão sistemática de pré-validação** antes de entregar o sketch ao usuário. O objetivo é reduzir ciclos de compilação, correção e retrabalho.
+
+A revisão deve, no mínimo, verificar:
+
+- **Pinos utilizados:** conflitos, GPIOs de entrada/saída, pinos somente entrada, boot strapping, backlight, touch, SD, TFT e periféricos.
+- **Bibliotecas e versões:** compatibilidade com as bibliotecas efetivamente usadas no projeto e com o core ESP32 instalado.
+- **Memória RAM:** uso de heap, sprites, buffers, Strings, pilha de tarefas FreeRTOS e risco de fragmentação ou estouro.
+- **Bloqueios da interface:** chamadas longas, rede, leitura de SD/ICS, delays, loops e operações que possam impedir touch, renderização ou comandos.
+- **Touch:** GPIOs, IRQ, calibração, transformação de coordenadas, debounce, áreas clicáveis e retorno HOME.
+- **SPI:** coexistência TFT, microSD e touch; barramentos, CS, clocks, ordem de inicialização e risco de contenção.
+- **Limpeza e atualização de telas:** artefatos visuais, conteúdo antigo, regiões não redesenhadas, sobreposição e consistência entre mudanças de tela.
+- **Display:** rotação, resolução, driver, ordem de cores, fonte, sprite, clipping e uso de memória gráfica.
+- **Compatibilidade com a variante exata do CYD:** ESP32-2432S028, ILI9341, XPT2046, GPIOs e particularidades já confirmadas em hardware neste projeto.
+- **Regressões:** preservar recursos previamente validados, salvo mudança explicitamente aprovada.
+
+A revisão deve separar claramente:
+
+1. **Problemas confirmados:** falhas identificadas no código ou incompatibilidades objetivas que devem ser corrigidas antes da entrega.
+2. **Riscos dependentes de teste:** pontos que parecem corretos por inspeção, mas cuja confirmação depende de compilação, hardware, tempo de execução, rede, SD, touch ou condições reais.
+
+**Regra evolutiva da revisão:** sempre que um novo problema for identificado e considerado passível de ocorrer novamente, ele deve ser incorporado à checklist permanente de pré-validação das próximas versões.
+
+**Benefício esperado:** reduzir o número de ciclos de compilação, teste e correção, aumentando a confiabilidade de cada entrega.
