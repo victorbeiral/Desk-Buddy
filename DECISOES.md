@@ -53,6 +53,7 @@ Todo novo sketch gerado deverá ser organizado com **seções numeradas, identif
 | D-009 | Desenvolver por módulo e integrar posteriormente | Evita transportar código fora do foco (ex.: CLIMA completo durante fase HOME + AGENDA), mas preserva meta de integração. |
 | D-010 | Organizar o sketch nas 11 seções padronizadas | Melhora leitura, manutenção, auditoria e previne dificuldades com protótipos Arduino. |
 | D-011 | Documentar separadamente comportamento, decisões e versões | Elimina duplicações e diferencia requisito de justificativa e evidência. |
+| D-012 | Preservar AGENDA visível durante a atualização ICS, com `ICS...` amarelo no rodapé esquerdo | Evita interromper a leitura da agenda. Exige buffer separado/snapshot consistente e troca controlada somente após sucesso; na ausência de dados iniciais mantém carregamento. **Solicitado em 13/11/2026, ainda não implementado na v1.9.1.** |
 
 As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reorganização. Não representam validação nova de hardware.
 
@@ -80,6 +81,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 - [ ] **Display e fonte:** driver ILI9341, TFT_BGR, rotação 1, resolução, fontes, clipping e atualização de sprite.
 - [ ] **Limpeza/redesenho:** resíduos da tela anterior, sobreposição de textos, limpeza completa e atualização periódica.
 - [ ] **Agenda/relógio:** seleção e contador, limites do dia, evento em andamento, modo real/simulado e fuso.
+- [ ] **Atualização ICS sem sumir com a AGENDA:** manter snapshot válido, mostrar `ICS...` amarelo no canto inferior esquerdo, fazer troca atômica após sucesso, preservar dados se falhar e tratar mudança de data sem mostrar eventos antigos indevidamente.
 - [ ] **ICS/SD:** integridade de arquivos, recorrência, fusos, backups, download, erros e reprocessamento.
 - [ ] **Segurança:** segredos fora do código compartilhado; reconhecer TLS sem verificação como risco real da implementação conhecida.
 - [ ] **Regressão:** preservar HOME, touch, Serial, botões HOME, eventos reais e funções já validadas.
@@ -102,6 +104,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 | R-005 | v1.7.4 CLIMA: HTTP −1 em chamadas meteorológicas | Antes de reintegrar CLIMA, separar erro de rede/TLS/endpoint de falha do display/agenda; testar retorno HTTP. |
 | R-006 | Interface CYD compartilha recursos limitados | Rever RAM, CS/SPI e renderização sempre que novos módulos forem integrados. |
 | R-007 | HTTPS conhecido com `setInsecure()` | Não confundir download funcional com conexão autenticada por certificado TLS. |
+| R-008 | v1.9.1: durante releitura ICS, `drawAgenda()` apresenta carregamento no lugar dos eventos e a tarefa reescreve a lista | Não remover apenas a tela de carregamento; proteger o conjunto publicado por snapshot separado para que touch/renderização não consumam lista em atualização. Solicitação de melhoria pendente de implementação. |
 
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
