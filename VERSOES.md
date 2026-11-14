@@ -24,7 +24,7 @@
 | v1.8.0 | Parcialmente validada em hardware (13/11/2026) | HOME renderizada; touch abria AGENDA e CLIMA; retorno à HOME via Serial; SD/Wi-Fi OK, 770 VEVENT e seis reuniões corretas. Leitura ICS síncrona bloqueava touch e Serial por cerca de dois minutos. Aviso de GPIO36 INPUT_PULLUP. |
 | v1.8.1 | **Cinco testes funcionais aprovados pelo usuário (13/11/2026)** | ICS passou a tarefa FreeRTOS, interface não bloqueante, retorno HOME por touch, GPIO36 como INPUT. Inicialização OK; touch durante leitura OK; botões HOME OK; resultado da agenda OK; releitura OK. |
 | v1.9.0 | **Erro de compilação confirmado** | Compilador apontou `AgendaView does not name a type`; tipo personalizado e geração automática de protótipos Arduino foram identificados como causa provável. Não considerar essa versão validada. |
-| v1.9.1 | **Interface validada parcialmente em hardware (13/11/2026)** | Substituição de `AgendaView` por `selectAgenda(time_t,int&,int&,int&,bool&)`; AGENDA com dois eventos, destaque de andamento e contador, sem paginação. Usuário confirmou “esta mostrando corretamente” e depois confirmou que navegação touch e botões HOME “continuam” funcionando. Releitura ICS, rollover do dia e estabilidade prolongada ainda sem nova confirmação nessa versão. |
+| v1.9.1 | **Interface e Teste 01 de releitura validados parcialmente em hardware (13/11/2026)** | Substituição de `AgendaView` por `selectAgenda(time_t,int&,int&,int&,bool&)`; AGENDA com dois eventos, destaque de andamento e contador, sem paginação. Usuário confirmou “esta mostrando corretamente”, touch e botões HOME funcionando. **Teste 01: “tudo ok”** para releitura ICS local com comando `E`, touch durante a leitura, navegação HOME/CLIMA e agenda final. Download HTTPS, avanço automático do relógio, virada de dia e estabilidade prolongada ainda pendentes. |
 
 **Referência atual de interface:** v1.9.1.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
@@ -54,18 +54,18 @@ Na regra introduzida na v1.9.1, a seleção às 08:00 deve mostrar os dois event
 | Inicialização | **OK informado** | Executada implicitamente para exibir interface; não registrada como ensaio separado |
 | HOME e AGENDA na tela | **OK informado** | **OK: exibição correta informada** |
 | Dois eventos e contador, sem paginação | Não se aplica (tela anterior) | **OK: exibição correta informada** |
-| Touch durante leitura ICS | **OK informado** | **Não revalidado especificamente** |
+| Touch durante leitura ICS | **OK informado** | **OK informado: Teste 01, releitura ICS local** |
 | Navegação por touch | **OK informado** | **OK informado** |
 | Botões de retorno HOME | **OK informado** | **OK informado** |
 | Resultado da agenda | **OK informado** | **OK: exibição informada** |
-| Releitura ICS | **OK informado** | **Pendente de reconfirmação** |
+| Releitura ICS | **OK informado** | **OK informado: Teste 01 com comando `E`** |
 | Download HTTPS real | Não confirmado como ensaio independente | **Pendente** |
 | Virada de dia/modo real | **Pendente** | **Pendente** |
 | Calibração fina touch e placeholders + | **Pendente** | **Pendente** |
 | Tempo de execução prolongado, heap e resets | **Pendente** | **Pendente** |
 | Reintegração CLIMA completo | Adiada | **Adiada** |
 
-Não confundir a confirmação de que o touch continua funcionando com teste específico **durante** nova leitura ICS na v1.9.1.
+Na v1.9.1, o usuário informou **Teste 01 integralmente OK**, incluindo touch durante a releitura **local** ICS; o ensaio não confirma download HTTPS real nem toda forma de concorrência.
 
 ## 5. Histórico de problemas e classificação
 
@@ -94,8 +94,9 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 ## 6. Pendências abertas e plano de próxima validação
 
 - [ ] Confirmar hora, data, modo real e Wi-Fi após inicialização.
-- [ ] Revalidar explicitamente releitura ICS na v1.9.1.
-- [ ] Revalidar touch e Serial durante leitura e download ICS na v1.9.1.
+- [x] Revalidar explicitamente releitura ICS **local** na v1.9.1 (Teste 01, comando `E`; usuário: “tudo ok”).
+- [x] Revalidar touch e navegação durante **releitura ICS local** na v1.9.1 (Teste 01, usuário: “tudo ok”).
+- [ ] Revalidar especificamente responsividade Serial durante operação e touch/Serial durante **download HTTPS real** na v1.9.1.
 - [ ] Testar troca do evento atual/próximo à medida que o relógio avança.
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
@@ -104,6 +105,12 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 - [ ] Testar integração final dos módulos quando forem reunidos.
 
 **Nota de rastreabilidade:** a v1.8.1 é referência para as cinco verificações funcionais informadas; a v1.9.1 é a referência **mais recente para a interface**, com escopo de validação explicitamente limitado.
+
+### Registro de teste — v1.9.1, Teste 01 (13/11/2026)
+
+**Procedimento solicitado:** na AGENDA, executar `E` pelo Monitor Serial (releitura do ICS armazenado no microSD); durante `ATUALIZANDO`, navegar por touch para HOME, CLIMA e AGENDA; após conclusão, conferir dois eventos, contador `+4 eventos hoje` e saída de processamento no Serial.
+
+**Resposta do usuário:** “teste 01 tudo ok”. **Conclusão:** aprovação conjunta dos itens solicitados no Teste 01: releitura ICS local, touch/navegação durante leitura e apresentação final da agenda. Não há logs anexados nem medições de duração/heap. Não extrapolar o resultado para o comando `I`, download HTTPS, virada de dia ou estabilidade prolongada.
 
 ## 7. Registro de documentação
 
