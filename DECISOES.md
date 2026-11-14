@@ -53,7 +53,8 @@ Todo novo sketch gerado deverá ser organizado com **seções numeradas, identif
 | D-009 | Desenvolver por módulo e integrar posteriormente | Evita transportar código fora do foco (ex.: CLIMA completo durante fase HOME + AGENDA), mas preserva meta de integração. |
 | D-010 | Organizar o sketch nas 11 seções padronizadas | Melhora leitura, manutenção, auditoria e previne dificuldades com protótipos Arduino. |
 | D-011 | Documentar separadamente comportamento, decisões e versões | Elimina duplicações e diferencia requisito de justificativa e evidência. |
-| D-012 | Preservar AGENDA visível durante a atualização ICS, com `Atualização em andamento` em amarelo no rodapé | Evita interromper a leitura da agenda. Exige buffer separado/snapshot consistente e troca controlada somente após sucesso; na ausência de dados iniciais mantém carregamento. **Solicitado em 13/11/2026, ainda não implementado na v1.9.1.** |
+| D-012 | Preservar AGENDA visível durante releitura ICS, com um único indicador amarelo | Evita interromper a consulta dos eventos. Implementado e confirmado pelo usuário na v1.9.2.1; exibição incorreta da frase acentuada motivou substituição por `Atualizando agenda` na v1.9.2.2 (a validar). |
+| D-013 | Remover somente o botão HOME superior da AGENDA, preservando o inferior | Pedido do usuário após inspeção visual da v1.9.2.1; evita duplicidade visual. O toque na antiga área superior também deixa de navegar na AGENDA; outras telas mantêm o comportamento existente. Entregue na v1.9.2.2, pendente de teste. |
 
 As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reorganização. Não representam validação nova de hardware.
 
@@ -76,12 +77,12 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 - [ ] **Bibliotecas/core:** includes disponíveis, APIs compatíveis, configuração TFT_eSPI, core ESP32 3.3.12 e seleção de SD. Conferir **argumentos padrão apenas uma vez**, preferencialmente nos protótipos; evitar nomes genéricos conflitantes (ex.: `dim`) e, quando possível, executar compilação real Arduino em vez de confiar somente em stubs.
 - [ ] **RAM e pilhas:** heap livre, sprite 320 × 240 × 8 bits, Strings, buffers ICS, stack FreeRTOS, risco de fragmentação.
 - [ ] **Bloqueios:** HTTPS, Wi-Fi, leitura de SD/ICS, delays/loops, tempo de resposta touch e Serial.
-- [ ] **Touch:** XPT2046, IRQ36 INPUT, calibração, debounce, transformação X/Y, zonas dos cartões e retorno HOME.
+- [ ] **Touch:** XPT2046, IRQ36 INPUT, calibração, debounce, transformação X/Y, zonas dos cartões e retorno HOME. Toda remoção de botão deve remover também sua área de toque, sem afetar as outras telas.
 - [ ] **SPI:** barramentos e CS de TFT/SD/touch, clocks, inicialização e concorrência no acesso.
-- [ ] **Display e fonte:** driver ILI9341, TFT_BGR, rotação 1, resolução, fontes, clipping e atualização de sprite.
+- [ ] **Display e fonte:** driver ILI9341, TFT_BGR, rotação 1, resolução, fontes, clipping e atualização de sprite. Verificar suporte real a caracteres UTF-8/acento nas fontes selecionadas; conferir largura disponível, sem truncar indicador de estado.
 - [ ] **Limpeza/redesenho:** resíduos da tela anterior, sobreposição de textos, limpeza completa e atualização periódica.
 - [ ] **Agenda/relógio:** seleção e contador, limites do dia, evento em andamento, modo real/simulado e fuso.
-- [ ] **Atualização ICS sem sumir com a AGENDA:** manter snapshot válido, mostrar `Atualização em andamento` em amarelo no rodapé, fazer troca atômica após sucesso, preservar dados se falhar e tratar mudança de data sem mostrar eventos antigos indevidamente.
+- [ ] **Atualização ICS sem sumir com a AGENDA:** manter snapshot válido, mostrar indicador amarelo único `Atualizando agenda` no rodapé da AGENDA, fazer troca controlada após sucesso, preservar dados se falhar e tratar mudança de data sem mostrar eventos antigos indevidamente.
 - [ ] **ICS/SD:** integridade de arquivos, recorrência, fusos, backups, download, erros e reprocessamento.
 - [ ] **Segurança:** segredos fora do código compartilhado; reconhecer TLS sem verificação como risco real da implementação conhecida.
 - [ ] **Regressão:** preservar HOME, touch, Serial, botões HOME, eventos reais e funções já validadas.
@@ -106,7 +107,9 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 | R-007 | HTTPS conhecido com `setInsecure()` | Não confundir download funcional com conexão autenticada por certificado TLS. |
 | R-009 | Pré-validação v1.9.2: argumento padrão declarado simultaneamente no protótipo e na definição de `touchRead` | Declarar valores padrão apenas no protótipo; revisão de sintaxe C++ com interfaces simuladas detectou o erro e a correção passou sem avisos. Compilação real Arduino ainda pendente. |
 | R-010 | Compilação Arduino v1.9.2: `int dim(int,int) was declared extern and later static` | Evitar identificadores de função genéricos que conflitem com declarações geradas/cabeçalhos, manter protótipos consistentes e conferir resultados **no pré-processador Arduino real**, não apenas em stubs. v1.9.2.1 renomeia `dim()` para `daysInMonth()`; compilação real pendente. |
-| R-008 | v1.9.1: durante releitura ICS, `drawAgenda()` apresenta carregamento no lugar dos eventos e a tarefa reescreve a lista | Na v1.9.2 foi preparada separação em dois buffers de eventos e troca somente ao completar; **compilação Arduino e teste no CYD pendentes**. |
+| R-008 | v1.9.1: durante releitura ICS, `drawAgenda()` apresenta carregamento no lugar dos eventos e a tarefa reescreve a lista | A v1.9.2.1 implementou dois buffers de eventos, atualização somente ao completar; **preservação visual confirmada no CYD pelo usuário**. |
+
+| R-011 | v1.9.2.1: texto amarelo de atualização com caracteres ausentes/corrompidos (`Atualizao...`) na tela | Verificar caracteres suportados pela fonte TFT_eSPI e largura real do rodapé; usar expressão legível e adequada (`Atualizando agenda`), sem UTF-8 não suportado; confirmar no CYD. A v1.9.2.2 implementa o ajuste, teste pendente. |
 
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
@@ -123,7 +126,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 
 ## 7. Aplicação prática ao ciclo atual
 
-- **Foco:** HOME + AGENDA da linha v1.9.1.
+- **Foco:** HOME + AGENDA, linha v1.9.2.1 validada funcionalmente para leitura ICS; v1.9.2.2 com ajuste visual pendente de validação.
 - **CLIMA:** manter cartão/navegação e placeholder, sem trazer implementação meteorológica ao sketch enquanto não trabalharmos nesse módulo.
 - **Integração futura:** reunir módulos parcialmente validados e fazer nova revisão sistemática + regressão cruzada.
 - **Próxima entrega de firmware:** aplicar o padrão de 11 seções e a checklist; **não alterar o sketch atual apenas por reorganização documental**.
