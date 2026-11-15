@@ -28,9 +28,11 @@
 | v1.9.2 | **Erro de compilação relatado (13/11/2026)** | Scanner ICS em buffers de 4096 bytes, primeira passagem seletiva para UID/RECURRENCE-ID, medições `[PERF]` por passagem (tempo, SD, bytes, blocos, linhas), dois bancos de eventos com troca após sucesso, manutenção da AGENDA visível e indicador único `Atualização em andamento`. Mantém HOME, touch, retorno HOME, comandos, simulação e parser parcial. Verificação de sintaxe C++ com bibliotecas simuladas não detectou conflito envolvendo a função `dim()`. Arduino IDE ESP32 3.3.12 apresentou erro `'int dim(int, int)' was declared 'extern' and later 'static'`; versão substituída pela v1.9.2.1. |
 | v1.9.2.1 | **Compilação/execução, desempenho ICS e preservação visual da AGENDA confirmados no CYD (13/11/2026)** | Corrigido conflito de `dim()` para `daysInMonth()`. Dois ciclos locais ICS: 12.454 e 12.698 s; ambos `result=OK`, 770 VEVENT, 53 séries, 187 exceções, seis reuniões, visão `+4 eventos hoje`. Logs de touch durante a releitura comprovam atendimento e retorno HOME. Indicador amarelo e preservação visual dos eventos **confirmados pelo usuário** durante releitura, porém mensagem do indicador apresentou renderização incorreta (`Atualizao...`). Download HTTPS e estabilidade prolongada pendentes. |
 
-| v1.9.2.2 | **Ajuste de UI entregue; compilação Arduino e validação no CYD pendentes (13/11/2026)** | AGENDA: remove apenas o botão HOME superior e desativa sua área touch; mantém retorno HOME inferior. Mensagem amarela substituída por `Atualizando agenda`, evitando caracteres acentuados que não renderizaram corretamente no TFT e cabendo antes do botão inferior. Nenhuma mudança na leitura ICS, pinagem, Wi-Fi, memória ou algoritmo dos eventos. Revisão estática e C++17 com interfaces simuladas concluídas sem erros; falta compilação real/hardware. |
+| v1.9.2.2 | **Ajuste de UI confirmado pelo usuário após entrega (14/11/2026)** | AGENDA: remove apenas o botão HOME superior e desativa sua área touch; mantém retorno HOME inferior. Mensagem amarela substituída por `Atualizando agenda`, evitando caracteres acentuados que não renderizaram corretamente no TFT e cabendo antes do botão inferior. Nenhuma mudança na leitura ICS, pinagem, Wi-Fi, memória ou algoritmo dos eventos. Revisão estática e C++17 com interfaces simuladas concluídas sem erros; o usuário confirmou que o ajuste funcionou. Essa confirmação não abrange uso prolongado. |
 
-**Referência atual para processamento ICS com medição no CYD:** v1.9.2.1 (execução e resultados confirmados por logs). **Referência de interface visual aprovada anteriormente:** v1.9.1. **v1.9.2:** erro de compilação informado.
+| v1.9.3 | **Novo firmware preparado para uso real a partir de 16/11/2026; testes Arduino/CYD pendentes (14/11/2026)** | Inicia com `simulation=false`; espera NTP válido; carrega ICS local do dia; busca automaticamente ICS Outlook por HTTPS após leitura local; repete a cada 30 min e tenta novamente após 10 min em falha; na virada de dia reprocessa a seleção e não apresenta dados antigos como atuais. Mantém duplo buffer, processamento de ~12,5 s medido na versão anterior, touch e HOME inferior; valida início/fim do arquivo recebido e preserva/restaura `.bak` se o processamento do download falhar. Revisão C++17 com bibliotecas simuladas sem erros/avisos; sem compilação Arduino real ou validação da busca HTTPS nesta versão. TLS `setInsecure()` permanece risco conhecido. |
+
+**Referência para processamento ICS com medição no CYD:** v1.9.2.1; **interface aprovada:** v1.9.2.2; **v1.9.3:** aguardando validação do uso real (execução e resultados confirmados por logs). **Referência de interface visual aprovada anteriormente:** v1.9.1. **v1.9.2:** erro de compilação informado.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
 **Estado do `.ino` no GitHub:** o firmware mais recente foi entregue integralmente no chat; **não presumir arquivo de firmware commitado no repositório**.
 
@@ -105,7 +107,8 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 - [ ] Testar **troca entre eventos** quando reunião começa/termina (não abrangida pela simples virada de minuto do Teste 02).
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
 - [x] **Preservação visual v1.9.2.1:** usuário confirmou que eventos/contador permanecem visíveis com indicador amarelo durante releitura; observou erro de renderização da frase acentuada.
-- [ ] **Validar visual e touch v1.9.2.2:** mensagem `Atualizando agenda` inteiramente legível, somente botão HOME inferior visível/ativo na AGENDA, touch da área superior sem navegar, e indicadores sem colisão.
+- [x] **Validar visual e touch v1.9.2.2:** o usuário respondeu “confirmado” ao teste da mensagem legível, HOME inferior e ajuste visual.
+- [ ] **Validar a v1.9.3 em modo real:** após NTP, data/hora reais e eventos do dia, download HTTPS automático, atualização de 30 min, recuperação após falha, virada de dia e touch responsivo.
 - [ ] Testar especificamente atualização por HTTPS, falha do download e preservação do snapshot no CYD.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
 - [ ] Testar estabilidade prolongada e coletar heap/reset quando possível.
@@ -164,6 +167,12 @@ Nos dois ciclos: **2.024.858 bytes por passagem**, 495 blocos por passagem, 18.8
 **Falha confirmada:** mensagem de estado exibida incorretamente; **causa técnica provável, não comprovada isoladamente:** suporte incompleto a UTF-8/acento na fonte e/ou largura disponível. **Correção implementada na v1.9.2.2:** indicador `Atualizando agenda` (frase correta, sem acentos e mais curta) usando fonte bitmap 2 com largura máxima disponível; botão HOME superior removido apenas da AGENDA e antiga área de toque desabilitada, preservando o inferior. Outras telas, ICS e HOME principal inalterados.
 
 **Pré-validação:** comparação do diff com v1.9.2.1 e verificação C++17 com cabeçalhos simulados (`-Wall -Wextra -Werror -fsyntax-only`) concluídas sem erros; verificações de 11 seções, protótipos, pinagem touch, SD, buffers, seleção de tela e botão inferior. **Compilação real no Arduino ESP32 3.3.12 e teste de display/touch ainda pendentes**.
+
+### v1.9.3 — preparação para operação real (14/11/2026)
+
+**Objetivo aprovado pelo usuário:** deixar a AGENDA funcional, buscando eventos reais do dia para testar na prática a partir de segunda-feira, **16/11/2026**. A v1.9.2.2 teve o ajuste visual confirmado.
+
+**Implementação v1.9.3, ainda não testada no CYD:** simulação desligada na partida, sincronização NTP, leitura ICS local inicial, download Outlook em FreeRTOS, atualização automática a cada 30 min no modo real, nova tentativa em 10 min após falha, passagem de dia, backup do ICS até confirmação de parse, mensagem `Atualizando agenda`, comando `T` preservado só para testes. **Revisão pré-entrega:** verificação de sintaxe C++17 (`-Wall -Wextra -Werror`) usando cabeçalhos simulados; não equivale a compilação com core ESP32 real. **Riscos:** consumo de heap durante TLS+SD, confiabilidade da URL publicada Outlook, parser RFC5545 parcial, certificado TLS não verificado, recuperação após falhas de energia/rede e operação prolongada.
 
 ### Preparação da v1.9.2 — revisão pré-entrega (13/11/2026)
 
