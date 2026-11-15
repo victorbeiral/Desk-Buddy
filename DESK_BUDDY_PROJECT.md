@@ -1,8 +1,8 @@
 # Desk Buddy — Índice do projeto
 
-**Revisão documental:** 1.9 — 13/11/2026
+**Revisão documental:** 2.0 — 14/11/2026
 **Status:** REFERÊNCIA DE TRABALHO — PENDENTE DE VALIDAÇÃO INTEGRAL DO CONTEÚDO
-**Firmware mais recente executado no CYD:** v1.9.2.1 — dois ciclos de ICS local em 12,454 e 12,698 s, seis reuniões e touch durante releitura comprovados por logs. **Preservação da AGENDA durante releitura e presença do indicador amarelo confirmadas; texto com falha de caracteres. v1.9.2.2 preparada para corrigir esse problema.**
+**Firmware mais recente executado no CYD:** v1.9.2.1 — dois ciclos de ICS local em 12,454 e 12,698 s, seis reuniões e touch durante releitura comprovados por logs. **v1.9.2.2 teve ajuste visual confirmado. v1.9.3 foi preparada para uso real (NTP + ICS Outlook automático), ainda sem testes no CYD.**
 **Último conjunto completo de cinco testes funcionais informado:** v1.8.1.
 
 > Este arquivo é agora um **índice**, não mais o repositório de todas as informações. A divisão documental não altera firmware, hardware nem validações previamente obtidas.
@@ -17,7 +17,7 @@
 
 ## Estado atual do desenvolvimento
 
-- **Foco do ciclo:** HOME + AGENDA; v1.9.1 validada nos Testes 01 e 02, v1.9.2 apresentou conflito de compilação em `dim()`; v1.9.2.1 corrigiu o identificador e teve a leitura ICS em blocos executada no CYD, com grande redução de tempo; preservação visual dos eventos e indicador amarelo confirmada pelo usuário; texto do indicador exibiu caracteres incorretos. v1.9.2.2 ajusta mensagem e remove HOME superior apenas da AGENDA, pendente de testes. HOME sem mudanças visuais; agenda com dois eventos e contador.
+- **Foco do ciclo:** HOME + AGENDA; v1.9.2.2 teve ajuste visual confirmado. v1.9.3 preparada para iniciar no relógio real, ler o ICS local e baixar Outlook automaticamente a cada 30 min (retry após 10 min), visando teste cotidiano a partir de segunda-feira 16/11/2026. Validação de download HTTPS, heap e virada do dia ainda pendente. HOME sem mudanças visuais; agenda com dois eventos e contador.
 - **CLIMA:** placeholder, implementação completa adiada, não descartada.
 - **Objetivo posterior:** integrar todos os módulos parcialmente validados e realizar nova revisão de regressão, RAM, SPI e interface.
 - **Novo padrão de código:** seções numeradas 01–11 e protótipos explícitos; aplicados na preparação da v1.9.2.
@@ -38,4 +38,4 @@
 
 A versão completa deste documento até a **revisão 1.6 (13/11/2026)** segue disponível no **histórico Git**. Sua informação relevante foi distribuída entre os três arquivos acima. A autorização para reorganizar os arquivos **não equivale** a validar integralmente a exatidão técnica de cada registro.
 
-**Próxima ação técnica:** compilar e validar a v1.9.2.2 no CYD (indicador legível, único botão HOME inferior na AGENDA e ausência de regressões); preservar desempenho da v1.9.2.1, depois decidir sobre cache diário.
+**Próxima ação técnica:** compilar e carregar a v1.9.3 no CYD; verificar Wi-Fi/NTP, primeira consulta automática ao Outlook, exibição de eventos reais e navegação. Registrar resultados do uso de segunda-feira.
