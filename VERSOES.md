@@ -32,9 +32,11 @@
 
 | v1.9.3 | **Erro de compilação reportado no Arduino ESP32 3.3.12 (14/11/2026)** | Inicia com `simulation=false`; espera NTP válido; carrega ICS local do dia; busca automaticamente ICS Outlook por HTTPS após leitura local; repete a cada 30 min e tenta novamente após 10 min em falha; na virada de dia reprocessa a seleção e não apresenta dados antigos como atuais. Mantém duplo buffer, processamento de ~12,5 s medido na versão anterior, touch e HOME inferior; valida início/fim do arquivo recebido e preserva/restaura `.bak` se o processamento do download falhar. Revisão C++17 com bibliotecas simuladas sem erros/avisos; sem compilação Arduino real ou validação da busca HTTPS nesta versão. TLS `setInsecure()` permanece risco conhecido. |
 
-| v1.9.3.1 | **Correção de compilação preparada, aguardando teste Arduino/CYD (14/11/2026)** | Corrige a definição de `daysInMonth()` mantendo nome e assinatura, mas eliminando a tabela local `static const int a[]` na função de uma única linha; substitui por `switch` de meses com retorno de 28/29/30/31 e isola protótipo em linha própria. Mantém toda funcionalidade de modo real, NTP, HTTPS automático de 30 min e retry de 10 min da v1.9.3. Verificação C++17 com cabeçalhos simulados sem erros/avisos; **não é compilação real no Arduino**. A causa exata da geração de protótipos Arduino ainda não foi demonstrada por análise do `.ino.cpp` intermediário. |
+| v1.9.3.1 | **Compilação/execução no CYD confirmadas; ICS local OK; HTTPS falhou (14/11/2026)** | Corrige a definição de `daysInMonth()` mantendo nome e assinatura, mas eliminando a tabela local `static const int a[]` na função de uma única linha; substitui por `switch` de meses com retorno de 28/29/30/31 e isola protótipo em linha própria. Mantém toda funcionalidade de modo real, NTP, HTTPS automático de 30 min e retry de 10 min da v1.9.3. Verificação C++17 com cabeçalhos simulados sem erros/avisos; **ainda não era compilação real no Arduino no momento da entrega**. Compilação e execução posteriormente confirmadas pelo usuário com log de NTP/ICS local; HTTPS retornou `HTTP=-1`. A causa exata da geração de protótipos Arduino ainda não foi demonstrada por análise do `.ino.cpp` intermediário. |
 
-**Referência para processamento ICS com medição no CYD:** v1.9.2.1; **interface aprovada:** v1.9.2.2; **v1.9.3:** erro de compilação, corrigido em candidato **v1.9.3.1**, a validar (execução e resultados confirmados por logs). **Referência de interface visual aprovada anteriormente:** v1.9.1. **v1.9.2:** erro de compilação informado.
+| v1.9.3.2 | **Entregue para diagnóstico; compilação Arduino e teste CYD pendentes (14/11/2026)** | Após HTTP negativo, registra erro HTTP, diagnóstico TLS e testes DNS/TCP sem divulgar a URL Outlook. Se ICS local válido, exibe `Agenda livre` e `Outlook nao atualizado` em vez de erro genérico. Evita restaurar `.bak` antigo em falha antes da instalação de um novo ICS. Adiciona log do toque na antiga região HOME superior; preserva botão inferior, NTP e leitura ICS. Verificação C++17 com stubs aprovada, sem compilação real. |
+
+**Referência para processamento ICS com medição no CYD:** v1.9.2.1; **interface aprovada:** v1.9.2.2; **v1.9.3:** erro de compilação. **v1.9.3.1:** executou no CYD, leitura local aprovada, HTTPS falhou. **v1.9.3.2:** diagnóstico pendente. **Referência de interface visual aprovada anteriormente:** v1.9.1. **v1.9.2:** erro de compilação informado.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
 **Estado do `.ino` no GitHub:** o firmware mais recente foi entregue integralmente no chat; **não presumir arquivo de firmware commitado no repositório**.
 
@@ -110,7 +112,9 @@ A checklist preventiva e as razões para escolhas técnicas são mantidas em [DE
 - [ ] Testar virada de dia, casos de agenda vazia, evento único e sobreposições.
 - [x] **Preservação visual v1.9.2.1:** usuário confirmou que eventos/contador permanecem visíveis com indicador amarelo durante releitura; observou erro de renderização da frase acentuada.
 - [x] **Validar visual e touch v1.9.2.2:** o usuário respondeu “confirmado” ao teste da mensagem legível, HOME inferior e ajuste visual.
-- [ ] **Validar a v1.9.3 em modo real:** após NTP, data/hora reais e eventos do dia, download HTTPS automático, atualização de 30 min, recuperação após falha, virada de dia e touch responsivo.
+- [x] **v1.9.3.1 — execução em modo real:** Wi-Fi, 14/11/2026 21:16, ICS local em 12.641 ms, 770 VEVENT, 0 eventos no sábado e tentativa HTTPS comprovados.
+- [ ] **v1.9.3.2 — diagnóstico:** investigar `HTTP=-1` com `[TLS]` e `[NET]`, verificar aviso `Outlook nao atualizado`, testar toque especificamente no HOME inferior e validar recuperação de arquivo.
+- [ ] Ainda pendentes: download HTTPS bem-sucedido, atualização de 30 min, troca de dia e eventos reais, estabilidade.
 - [ ] Testar especificamente atualização por HTTPS, falha do download e preservação do snapshot no CYD.
 - [ ] Testar os dois cartões +, CLIMA placeholder e limpeza de tela sem artefatos.
 - [ ] Testar estabilidade prolongada e coletar heap/reset quando possível.
@@ -175,6 +179,14 @@ Nos dois ciclos: **2.024.858 bytes por passagem**, 495 blocos por passagem, 18.8
 **Log reportado pelo usuário:** na v1.9.3, o compilador Arduino ESP32 core 3.3.12 apontou `'int daysInMonth(int,int)' was declared 'extern' and later 'static'`, com referência à declaração explícita e à definição em linha única contendo vetor local `static const int a[]`. A v1.9.2 apresentou mensagem semelhante para o nome anterior `dim()`; portanto o **identificador não era explicação suficiente**. **Hipótese técnica provável, ainda não verificada no código intermediário da IDE:** interferência do pré-processamento Arduino no trecho compacto com armazenamento estático local.
 
 **Ação na v1.9.3.1:** remover por completo o vetor local `static`; usar `switch` para quantidade de dias do mês e declarar a assinatura em linha própria; a semântica 28/29/30/31 dias permanece igual para datas válidas. Verificação estática e compilação de sintaxe C++17 com stubs, `-Wall -Wextra -Werror -fsyntax-only`, **sem erros**. A compilação pela Arduino IDE real e o teste no CYD **ainda não foram executados**; não declarar correção comprovada até confirmação do usuário. Aviso “Multiple libraries for SD.h” é informativo quando a biblioteca do core ESP32 está sendo usada.
+
+### Relato de execução v1.9.3.1 e preparação v1.9.3.2 (14/11/2026)
+
+O usuário enviou log do CYD: Wi-Fi conectado, hora real 14/11/2026 21:16, leitura local **12.641 ms** e `result=OK`, 770 VEVENT, 187 exceções, 0 reuniões do sábado. O Outlook retornou `HTTP=-1` em 42 ms e houve nova tentativa agendada para 10 minutos. **A causa da conexão recusada/falha de conexão ainda não é conhecida.** `Agenda livre` é coerente com a leitura local; a mensagem `Falha na atualizacao` refletia falha de HTTPS, não falha da agenda local.
+
+Toques registrados na AGENDA: x entre 252 e 262, y entre 23 e 27, correspondendo **à antiga região do HOME superior removido**; não houve registro na faixa do HOME inferior (y entre 211 e 238), portanto falha do botão inferior ainda não foi demonstrada.
+
+**Risco lógico detectado na revisão:** após falha de download anterior à instalação de novo ICS, código v1.9.3.1 poderia restaurar backup velho caso `.bak` existisse. A v1.9.3.2 condiciona recuperação à substituição executada no download atual. Também acrescenta `errorToString`, erro TLS e testes de DNS/TCP (sem exibir URL privada), diferencia falha online da agenda local e registra a área de toque superior desativada. **Teste realizado:** sintaxe C++17 com interfaces simuladas, sem erros/avisos. **Não realizado:** compilação Arduino ESP32 3.3.12 e hardware v1.9.3.2. A versão não comprova solução do `HTTP=-1`. `setInsecure()` segue risco conhecido.
 
 ### v1.9.3 — preparação para operação real (14/11/2026)
 
