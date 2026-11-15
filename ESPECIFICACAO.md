@@ -1,7 +1,7 @@
 # Desk Buddy — Especificação funcional e técnica
 
 **Base documental:** reorganização do documento mestre rev. 1.6, em 13/11/2026.
-**Referência de interface mais recente confirmada pelo usuário:** v1.9.2.2 (indicador `Atualizando agenda`, HOME somente inferior na AGENDA e preservação da navegação). **v1.9.3:** preparado para uso real automático, compilação Arduino e teste CYD pendentes.
+**Referência de interface mais recente confirmada pelo usuário:** v1.9.2.2 (indicador `Atualizando agenda`, HOME somente inferior na AGENDA e preservação da navegação). **v1.9.3.1:** execução real confirmada, ICS local válido e tentativa HTTPS falhando `HTTP=-1`. **v1.9.3.2:** diagnóstico e recuperação de backup preparados, pendentes de validação.
 **Estado:** especificação consolidada como referência de trabalho; revisão integral do conteúdo ainda pendente de aprovação.
 **Escopo:** descrever **como o sistema deve funcionar**. Motivações ficam em [DECISOES.md](DECISOES.md); evidências de testes em [VERSOES.md](VERSOES.md).
 
@@ -90,7 +90,7 @@ A AGENDA deve priorizar **o que está acontecendo agora** ou **o próximo compro
 - Processar a leitura ICS em **tarefa FreeRTOS em segundo plano**, mantendo interface e comandos responsivos.
 - **Modo de uso real (v1.9.3, pendente de testes):** iniciar com simulação **desligada**; sincronizar hora por NTP; ler primeiro a cópia ICS local para o dia atual (se existir), depois baixar a versão atualizada por HTTPS; atualizar novamente por HTTPS a cada **30 minutos** em uso real, com nova tentativa após **10 minutos** em caso de falha. Estes intervalos são parâmetros iniciais de operação sujeitos a revisão após testes.
 - Na virada de dia, refazer a seleção do dia atual, não mostrar a agenda do dia anterior como se fosse atual, e buscar atualização HTTPS. Se não existir ICS local, baixar diretamente. Preservar os últimos dados válidos durante o processamento; evitar publicar lista incompleta após falhas.
-- Comandos Serial `E` (somente releitura local), `I` (download forçado) e `T`/`R` (simulação/real) permanecem disponíveis; o modo `T` não dispara atualizações periódicas. O arquivo `config_secrets.h` continua como única origem de credenciais e URL privada.
+- Comandos Serial `E` (somente releitura local), `I` (download forçado) e `T`/`R` (simulação/real) permanecem disponíveis; o modo `T` não dispara atualizações periódicas. O arquivo `config_secrets.h` continua como única origem de credenciais e URL privada. Se atualização HTTPS falhar, preservar ICS local válido e distinguir `Outlook nao atualizado` de erro de leitura local; diagnosticar DNS/TCP/TLS sem expor ICS_URL.
 - Zona de horário principal de teste: São Paulo, `BRT3` (UTC−3 nas datas atuais); sincronização NTP com a rede.
 - Tratar, na medida suportada pelo parser parcial, VEVENT simples, recorrências, exclusões, exceções e TZIDs Windows.
 - O parser **não é implementação integral do RFC 5545**. Casos ainda limitados incluem recorrências mensais/anuais e regras `BY*`, `RDATE`, `COUNT`, `EXDATE`, `RANGE=THISANDFUTURE`, `VTIMEZONE`, DST histórico e eventos de dia inteiro. Não afirmar cobertura completa pelo fato de seis reuniões conhecidas aparecerem corretamente.
