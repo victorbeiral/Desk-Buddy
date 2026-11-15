@@ -75,7 +75,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 
 - [ ] **Pinos:** TFT/backlight/touch/SD, modos INPUT/OUTPUT, pinos só entrada, pinos de boot e conflitos de GPIO.
 - [ ] **Variante exata CYD:** ESP32-2432S028, ILI9341, XPT2046, orientação e peculiaridades do equipamento confirmado.
-- [ ] **Bibliotecas/core:** includes disponíveis, APIs compatíveis, configuração TFT_eSPI, core ESP32 3.3.12 e seleção de SD. Conferir **argumentos padrão apenas uma vez**, preferencialmente nos protótipos; evitar nomes genéricos conflitantes (ex.: `dim`) e, quando possível, executar compilação real Arduino em vez de confiar somente em stubs.
+- [ ] **Bibliotecas/core:** includes disponíveis, APIs compatíveis, configuração TFT_eSPI, core ESP32 3.3.12 e seleção de SD. Conferir **argumentos padrão apenas uma vez**, preferencialmente nos protótipos; evitar nomes genéricos conflitantes e **vetores locais `static` em funções de uma única linha** (falhas de v1.9.2 e v1.9.3); quando possível, executar compilação real Arduino em vez de confiar somente em stubs.
 - [ ] **RAM e pilhas:** heap livre, sprite 320 × 240 × 8 bits, Strings, buffers ICS, stack FreeRTOS, risco de fragmentação.
 - [ ] **Bloqueios:** HTTPS, Wi-Fi, leitura de SD/ICS, delays/loops, tempo de resposta touch e Serial.
 - [ ] **Touch:** XPT2046, IRQ36 INPUT, calibração, debounce, transformação X/Y, zonas dos cartões e retorno HOME. Toda remoção de botão deve remover também sua área de toque, sem afetar as outras telas.
@@ -107,7 +107,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 | R-006 | Interface CYD compartilha recursos limitados | Rever RAM, CS/SPI e renderização sempre que novos módulos forem integrados. |
 | R-007 | HTTPS conhecido com `setInsecure()` | Não confundir download funcional com conexão autenticada por certificado TLS. |
 | R-009 | Pré-validação v1.9.2: argumento padrão declarado simultaneamente no protótipo e na definição de `touchRead` | Declarar valores padrão apenas no protótipo; revisão de sintaxe C++ com interfaces simuladas detectou o erro e a correção passou sem avisos. Compilação real Arduino ainda pendente. |
-| R-010 | Compilação Arduino v1.9.2: `int dim(int,int) was declared extern and later static` | Evitar identificadores de função genéricos que conflitem com declarações geradas/cabeçalhos, manter protótipos consistentes e conferir resultados **no pré-processador Arduino real**, não apenas em stubs. v1.9.2.1 renomeia `dim()` para `daysInMonth()`; compilação real pendente. |
+| R-010 | Compilação Arduino v1.9.2 e v1.9.3: funções `dim()` e `daysInMonth()` foram apontadas como `extern` e depois `static` | A mudança de nome não impediu a recorrência. Verificar também **definições compactas com vetor local `static`** e pré-processamento Arduino; v1.9.3.1 substituiu o vetor por `switch` e separou o protótipo. **Causa exata e correção real pendentes de confirmação na Arduino IDE**. |
 | R-008 | v1.9.1: durante releitura ICS, `drawAgenda()` apresenta carregamento no lugar dos eventos e a tarefa reescreve a lista | A v1.9.2.1 implementou dois buffers de eventos, atualização somente ao completar; **preservação visual confirmada no CYD pelo usuário**. |
 
 | R-011 | v1.9.2.1: texto amarelo de atualização com caracteres ausentes/corrompidos (`Atualizao...`) na tela | Verificar caracteres suportados pela fonte TFT_eSPI e largura real do rodapé; usar expressão legível e adequada (`Atualizando agenda`), sem UTF-8 não suportado; confirmar no CYD. A v1.9.2.2 implementa o ajuste, teste pendente. |
