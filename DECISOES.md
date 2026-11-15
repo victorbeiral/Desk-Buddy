@@ -54,7 +54,8 @@ Todo novo sketch gerado deverá ser organizado com **seções numeradas, identif
 | D-010 | Organizar o sketch nas 11 seções padronizadas | Melhora leitura, manutenção, auditoria e previne dificuldades com protótipos Arduino. |
 | D-011 | Documentar separadamente comportamento, decisões e versões | Elimina duplicações e diferencia requisito de justificativa e evidência. |
 | D-012 | Preservar AGENDA visível durante releitura ICS, com um único indicador amarelo | Evita interromper a consulta dos eventos. Implementado e confirmado pelo usuário na v1.9.2.1; exibição incorreta da frase acentuada motivou substituição por `Atualizando agenda` na v1.9.2.2 (a validar). |
-| D-013 | Remover somente o botão HOME superior da AGENDA, preservando o inferior | Pedido do usuário após inspeção visual da v1.9.2.1; evita duplicidade visual. O toque na antiga área superior também deixa de navegar na AGENDA; outras telas mantêm o comportamento existente. Entregue na v1.9.2.2, pendente de teste. |
+| D-013 | Remover somente o botão HOME superior da AGENDA, preservando o inferior | Pedido do usuário após inspeção visual da v1.9.2.1; evita duplicidade visual. O toque na antiga área superior também deixa de navegar na AGENDA; outras telas mantêm o comportamento existente. **Confirmado pelo usuário na v1.9.2.2.** |
+| D-014 | Ativar modo real automático de agenda na v1.9.3 | Para uso a partir de segunda-feira, iniciar com NTP e dia corrente, ler primeiro o ICS local, consultar Outlook automaticamente, repetir a cada 30 min, tentar novamente em 10 min após falha e recalcular na virada do dia. **Entregue para teste, não validado em hardware ainda.** |
 
 As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reorganização. Não representam validação nova de hardware.
 
@@ -81,9 +82,9 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 - [ ] **SPI:** barramentos e CS de TFT/SD/touch, clocks, inicialização e concorrência no acesso.
 - [ ] **Display e fonte:** driver ILI9341, TFT_BGR, rotação 1, resolução, fontes, clipping e atualização de sprite. Verificar suporte real a caracteres UTF-8/acento nas fontes selecionadas; conferir largura disponível, sem truncar indicador de estado.
 - [ ] **Limpeza/redesenho:** resíduos da tela anterior, sobreposição de textos, limpeza completa e atualização periódica.
-- [ ] **Agenda/relógio:** seleção e contador, limites do dia, evento em andamento, modo real/simulado e fuso.
+- [ ] **Agenda/relógio:** seleção e contador, limites do dia, evento em andamento, modo real/simulado e fuso. No modo de produção, **iniciar com simulação desativada**, aguardar NTP válido e refazer a leitura após virada do dia.
 - [ ] **Atualização ICS sem sumir com a AGENDA:** manter snapshot válido, mostrar indicador amarelo único `Atualizando agenda` no rodapé da AGENDA, fazer troca controlada após sucesso, preservar dados se falhar e tratar mudança de data sem mostrar eventos antigos indevidamente.
-- [ ] **ICS/SD:** integridade de arquivos, recorrência, fusos, backups, download, erros e reprocessamento.
+- [ ] **ICS/SD:** integridade de arquivos, recorrência, fusos, backups, download, erros e reprocessamento. Verificar bootstrap local→HTTPS, atualização automática periódica, intervalo de retry e recuperação `.bak` caso o arquivo novo não seja parseável.
 - [ ] **Segurança:** segredos fora do código compartilhado; reconhecer TLS sem verificação como risco real da implementação conhecida.
 - [ ] **Regressão:** preservar HOME, touch, Serial, botões HOME, eventos reais e funções já validadas.
 - [ ] **Compilação e hardware:** executar quando o ambiente estiver disponível; caso contrário, marcar explicitamente como **não executados**.
@@ -111,6 +112,8 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 
 | R-011 | v1.9.2.1: texto amarelo de atualização com caracteres ausentes/corrompidos (`Atualizao...`) na tela | Verificar caracteres suportados pela fonte TFT_eSPI e largura real do rodapé; usar expressão legível e adequada (`Atualizando agenda`), sem UTF-8 não suportado; confirmar no CYD. A v1.9.2.2 implementa o ajuste, teste pendente. |
 
+| R-012 | Risco de produção: firmware inicia no horário simulado ou lê apenas ICS local, impedindo agenda real atualizada | Verificar `simulation=false` no boot, sincronização NTP, carregamento local inicial, download HTTPS automático, atualização periódica e virada de dia. Aplicado em v1.9.3, testes reais pendentes. |
+
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
 ## 6. Protocolo de aprovação e manutenção
@@ -126,7 +129,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 
 ## 7. Aplicação prática ao ciclo atual
 
-- **Foco:** HOME + AGENDA, linha v1.9.2.1 validada funcionalmente para leitura ICS; v1.9.2.2 com ajuste visual pendente de validação.
+- **Foco:** HOME + AGENDA, linha v1.9.2.2 validada visualmente; v1.9.3 entregue para operação real automática e avaliação prática a partir de 16/11/2026.
 - **CLIMA:** manter cartão/navegação e placeholder, sem trazer implementação meteorológica ao sketch enquanto não trabalharmos nesse módulo.
 - **Integração futura:** reunir módulos parcialmente validados e fazer nova revisão sistemática + regressão cruzada.
 - **Próxima entrega de firmware:** aplicar o padrão de 11 seções e a checklist; **não alterar o sketch atual apenas por reorganização documental**.
