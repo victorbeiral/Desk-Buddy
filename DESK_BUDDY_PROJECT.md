@@ -1,8 +1,8 @@
 # Desk Buddy — Índice do projeto
 
-**Revisão documental:** 2.3 — 14/11/2026
+**Revisão documental:** 2.4 — 14/11/2026
 **Status:** REFERÊNCIA DE TRABALHO — PENDENTE DE VALIDAÇÃO INTEGRAL DO CONTEÚDO
-**Firmware mais recente executado no CYD:** v1.9.2.1 — dois ciclos de ICS local em 12,454 e 12,698 s, seis reuniões e touch durante releitura comprovados por logs. **v1.9.2.2 teve ajuste visual confirmado. v1.9.3 apresentou erro de compilação no Arduino; v1.9.3.1 executou no CYD (ICS local OK, Outlook HTTP=-1). v1.9.3.2 confirmou falha de alocação de RAM TLS (-32512) e inversão vertical dos toques. v1.9.3.3 candidata reduz sprite para 4 bits, mede bloco livre e corrige o eixo Y; testes CYD pendentes.**
+**Firmware mais recente executado no CYD:** v1.9.2.1 — dois ciclos de ICS local em 12,454 e 12,698 s, seis reuniões e touch durante releitura comprovados por logs. **v1.9.2.2 teve ajuste visual confirmado. v1.9.3 apresentou erro de compilação no Arduino; v1.9.3.1 executou no CYD (ICS local OK, Outlook HTTP=-1). v1.9.3.2 confirmou falha de alocação de RAM TLS (-32512) e inversão vertical dos toques. v1.9.3.3 apresentou erro de compilação por parêntese excedente em `tzOffset()`. **v1.9.3.4** corrige a sintaxe, preservando redução do sprite, diagnóstico de heap e ajuste do touch; pendente de compilação Arduino/CYD.**
 **Último conjunto completo de cinco testes funcionais informado:** v1.8.1.
 
 > Este arquivo é agora um **índice**, não mais o repositório de todas as informações. A divisão documental não altera firmware, hardware nem validações previamente obtidas.
@@ -38,4 +38,4 @@
 
 A versão completa deste documento até a **revisão 1.6 (13/11/2026)** segue disponível no **histórico Git**. Sua informação relevante foi distribuída entre os três arquivos acima. A autorização para reorganizar os arquivos **não equivale** a validar integralmente a exatidão técnica de cada registro.
 
-**Próxima ação técnica:** compilar/gravar v1.9.3.3; conferir HOME inferior e cartões, fontes, heap/maiorBloco durante HTTPS e se HTTP chega a 200. Não compartilhar ICS_URL.
+**Próxima ação técnica:** compilar/gravar v1.9.3.4; conferir HOME inferior e cartões, fontes, heap/maiorBloco durante HTTPS e se HTTP chega a 200. Não compartilhar ICS_URL.
