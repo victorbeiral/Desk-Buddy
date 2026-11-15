@@ -38,6 +38,8 @@
 
 | v1.9.3.3 | **Firmware candidato preparado, compilação Arduino e teste CYD pendentes (14/11/2026)** | Erro TLS `-32512`: reduz sprite de 8 para 4 bpp com paleta de nove cores, preservando fonte Noto com desenho direto no TFT; libera UIDs temporários das exceções ICS ao final do parse e registra maior bloco de heap para TLS. Eixo touch Y alterado de invertido para não invertido para alinhar HOME inferior físico ao hitbox e tornar área superior realmente inativa. Parser, modo real, download de 30 min/retry 10 min, backup e indicadores da v1.9.3.2 preservados. Sintaxe C++17 com stubs e revisão estática executadas sem erros; hardware e compilação Arduino não realizados. |
 
+| v1.9.3.4 | **Correção de sintaxe preparada; Arduino IDE e CYD pendentes (14/11/2026)** | Log da IDE na v1.9.3.3: `expected ';' before ')'` em `tzOffset()` (GMT STANDARD TIME). Removido parêntese excedente na expressão `off=(v>=a+3600&&v<b)?60:0;`. Demais funcionalidades preservadas. Verificação C++17 com interfaces simuladas (`-Wall -Wextra -Werror -fsyntax-only`) aprovada; **não equivale à compilação real Arduino**. |
+
 **Referência para processamento ICS com medição no CYD:** v1.9.2.1; **interface aprovada:** v1.9.2.2; **v1.9.3:** erro de compilação. **v1.9.3.1:** executou no CYD, leitura local aprovada, HTTPS falhou. **v1.9.3.2:** diagnóstico pendente. **Referência de interface visual aprovada anteriormente:** v1.9.1. **v1.9.2:** erro de compilação informado.
 **Última versão com cinco testes funcionais aprovados em conjunto:** v1.8.1.
 **Estado do `.ino` no GitHub:** o firmware mais recente foi entregue integralmente no chat; **não presumir arquivo de firmware commitado no repositório**.
@@ -189,6 +191,12 @@ O usuário enviou log do CYD: Wi-Fi conectado, hora real 14/11/2026 21:16, leitu
 Toques registrados na AGENDA: x entre 252 e 262, y entre 23 e 27, correspondendo **à antiga região do HOME superior removido**; não houve registro na faixa do HOME inferior (y entre 211 e 238), portanto falha do botão inferior ainda não foi demonstrada.
 
 **Risco lógico detectado na revisão:** após falha de download anterior à instalação de novo ICS, código v1.9.3.1 poderia restaurar backup velho caso `.bak` existisse. A v1.9.3.2 condiciona recuperação à substituição executada no download atual. Também acrescenta `errorToString`, erro TLS e testes de DNS/TCP (sem exibir URL privada), diferencia falha online da agenda local e registra a área de toque superior desativada. **Teste realizado:** sintaxe C++17 com interfaces simuladas, sem erros/avisos. **Não realizado:** compilação Arduino ESP32 3.3.12 e hardware v1.9.3.2. A versão não comprova solução do `HTTP=-1`. `setInsecure()` segue risco conhecido.
+
+### Correção de sintaxe v1.9.3.4 (14/11/2026)
+
+**Erro reportado na compilação Arduino da v1.9.3.3:** `error: expected ';' before ')' token` na linha `off=(v>=a+3600&&v<b)?60:0);` de `tzOffset()`. Correção: remover exclusivamente `)` excedente, ficando `off=(v>=a+3600&&v<b)?60:0;`. O aviso `Multiple libraries were found for SD.h` é informativo; a IDE selecionou a biblioteca do core ESP32 3.3.12.
+
+**Verificação executada:** arquivo integral v1.9.3.4 com 11 seções e protótipos explícitos, sintaxe C++17 com interfaces simuladas, `-Wall -Wextra -Werror -fsyntax-only`, sem erros; **compilação Arduino real e teste do CYD ainda pendentes**. Esse resultado não aprova TLS, touch, paleta gráfica nem recuperação do ICS.
 
 ### Diagnóstico definitivo de memória na v1.9.3.2 e candidato v1.9.3.3 (14/11/2026)
 
