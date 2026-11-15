@@ -123,6 +123,8 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 | R-015 | v1.9.3.2: `HTTP=-1`, TLS `-32512 SSL - Memory allocation failed`; DNS e TCP 443 OK | `HTTP=-1` é efeito de falha TLS por falta/fragmentação de memória, comprovado pelo erro de alocação. v1.9.3.3 reduz sprite de 8 para 4 bits, descarrega UIDs temporários de exceções e mede o maior bloco contíguo. HTTPS ainda pendente de sucesso em hardware. |
 | R-016 | v1.9.3.2: tentativa de usar HOME inferior gera toques em x~260, y~15 | `touchInvertY=true` converte o toque inferior para faixa superior, que agora é desativada. Ajuste proposto: `touchInvertY=false`, testar regressão de HOME/AGENDA/CLIMA/+ no CYD. |
 
+| R-017 | v1.9.3.3: erro de compilação `expected ';' before ')'` em `tzOffset()` | Revisão humana falhou ao deixar parêntese excedente `off=(v>=a+3600&&v<b)?60:0);`. Corrigir para `off=(v>=a+3600&&v<b)?60:0;` na v1.9.3.4; exigir checagem sintática do **artefato exato entregue**, não apenas de arquivo anterior ou diferente. Compilação Arduino pendente. |
+
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
 ## 6. Protocolo de aprovação e manutenção
