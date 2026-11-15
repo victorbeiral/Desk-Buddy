@@ -1,7 +1,7 @@
 # Desk Buddy — Especificação funcional e técnica
 
 **Base documental:** reorganização do documento mestre rev. 1.6, em 13/11/2026.
-**Referência de interface mais recente confirmada pelo usuário:** v1.9.2.2 (indicador `Atualizando agenda`, HOME somente inferior na AGENDA e preservação da navegação). **v1.9.3.1:** execução real confirmada, ICS local válido e tentativa HTTPS falhando `HTTP=-1`. **v1.9.3.2:** diagnóstico e recuperação de backup preparados, pendentes de validação.
+**Referência de interface mais recente confirmada pelo usuário:** v1.9.2.2 (indicador `Atualizando agenda`, HOME somente inferior na AGENDA e preservação da navegação). **v1.9.3.1:** execução real confirmada, ICS local válido e tentativa HTTPS falhando `HTTP=-1`. **v1.9.3.2:** diagnóstico executado em hardware: TLS falhou ao alocar memória. **v1.9.3.3:** redução de RAM via sprite 4 bits e correção de inversão touch, ainda pendente de compilação Arduino e teste no CYD.
 **Estado:** especificação consolidada como referência de trabalho; revisão integral do conteúdo ainda pendente de aprovação.
 **Escopo:** descrever **como o sistema deve funcionar**. Motivações ficam em [DECISOES.md](DECISOES.md); evidências de testes em [VERSOES.md](VERSOES.md).
 
@@ -15,7 +15,7 @@ Desk Buddy é um painel de mesa com ESP32 CYD 2,8", display touchscreen, conecti
 - **AGENDA:** calendário real Outlook, com visualização inteligente de até dois eventos e contador, sem paginação.
 - **CLIMA:** apenas tela de placeholder “EM BREVE”, sem consultas ao serviço meteorológico na linha atual de firmware.
 - **Cartões +:** reservados para módulos futuros; telas de placeholder.
-- **Retorno à HOME:** na **AGENDA**, apenas o botão inferior (tela v1.9.2.2, ainda a validar); nas telas placeholder, manter as áreas superior e inferior já existentes. Comandos Serial preservados para diagnóstico.
+- **Retorno à HOME:** na **AGENDA**, apenas o botão inferior (v1.9.2.2; novo ajuste de calibração Y candidato v1.9.3.3, a validar); nas telas placeholder, manter as áreas superior e inferior já existentes. Comandos Serial preservados para diagnóstico.
 - **Expansão:** módulos podem ser desenvolvidos isoladamente e reunidos em uma etapa posterior de integração. O módulo de monitoramento OpenAI foi discutido como **proposta**, não como requisito aprovado ou implementado.
 
 ## 2. Hardware de referência — variante exata
@@ -25,12 +25,12 @@ Desk Buddy é um painel de mesa com ESP32 CYD 2,8", display touchscreen, conecti
 | Placa | ESP32-2432S028 / CYD 2,8" |
 | TFT | ILI9341, 320 × 240, paisagem, rotação 1 |
 | Biblioteca gráfica | TFT_eSPI com ILI9341_2_DRIVER, TFT_BGR, HSPI, 27 MHz |
-| Renderização | TFT_eSprite 320 × 240 em 8 bits |
+| Renderização | v1.9.2.2/1.9.3.2: sprite 8 bits; v1.9.3.3: paleta 4 bits e fonte Noto diretamente no TFT para liberar RAM para TLS (a validar) |
 | Backlight | GPIO 21 |
 | microSD | VSPI: SCK 18, MISO 19, MOSI 23, CS 5, 4 MHz |
 | Touch | XPT2046 bit-bang: CLK 25, MOSI 32, MISO 39, CS 33, IRQ 36 |
 | GPIO36 | **INPUT**, não INPUT_PULLUP (pino somente entrada, sem pull-up interno) |
-| Calibração touch conhecida | `swapXY=true`, `invertX=false`, `invertY=true`, limites aproximados 250/3850 |
+| Calibração touch conhecida | v1.9.3.2: `swapXY=true`, `invertX=false`, `invertY=true`; toques físicos no HOME inferior produziram y=10–24. v1.9.3.3 propõe `invertY=false` para alinhar ao display, ainda a validar. Limites 250/3850. |
 | Arduino | Core ESP32 3.3.12 observado; placa “ESP32 Dev Module”; flash DIO 40 MHz; PSRAM off |
 | Monitor Serial | 115200 |
 | Fonte | `NotoSansBold15.h` local, sem distribuição pública |
