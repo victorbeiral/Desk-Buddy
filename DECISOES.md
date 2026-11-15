@@ -55,7 +55,8 @@ Todo novo sketch gerado deverá ser organizado com **seções numeradas, identif
 | D-011 | Documentar separadamente comportamento, decisões e versões | Elimina duplicações e diferencia requisito de justificativa e evidência. |
 | D-012 | Preservar AGENDA visível durante releitura ICS, com um único indicador amarelo | Evita interromper a consulta dos eventos. Implementado e confirmado pelo usuário na v1.9.2.1; exibição incorreta da frase acentuada motivou substituição por `Atualizando agenda` na v1.9.2.2 (a validar). |
 | D-013 | Remover somente o botão HOME superior da AGENDA, preservando o inferior | Pedido do usuário após inspeção visual da v1.9.2.1; evita duplicidade visual. O toque na antiga área superior também deixa de navegar na AGENDA; outras telas mantêm o comportamento existente. **Confirmado pelo usuário na v1.9.2.2.** |
-| D-014 | Ativar modo real automático de agenda na v1.9.3 | Para uso a partir de segunda-feira, iniciar com NTP e dia corrente, ler primeiro o ICS local, consultar Outlook automaticamente, repetir a cada 30 min, tentar novamente em 10 min após falha e recalcular na virada do dia. **Entregue para teste, não validado em hardware ainda.** |
+| D-014 | Ativar modo real automático de agenda na v1.9.3 | A v1.9.3.1 comprovou Wi-Fi, modo real, leitura local e tentativa automática por HTTPS no CYD. **HTTP=-1:** falha online a diagnosticar. |
+| D-015 | Distinguir agenda local de falha online e preservar backup | Na v1.9.3.2, mostrar `Outlook nao atualizado` se o ICS local válido persistir, registrar DNS/TCP/TLS sem URL privada e restaurar `.bak` somente se esta tentativa instalou outro ICS; pendente de teste em hardware. |
 
 As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reorganização. Não representam validação nova de hardware.
 
@@ -84,7 +85,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 - [ ] **Limpeza/redesenho:** resíduos da tela anterior, sobreposição de textos, limpeza completa e atualização periódica.
 - [ ] **Agenda/relógio:** seleção e contador, limites do dia, evento em andamento, modo real/simulado e fuso. No modo de produção, **iniciar com simulação desativada**, aguardar NTP válido e refazer a leitura após virada do dia.
 - [ ] **Atualização ICS sem sumir com a AGENDA:** manter snapshot válido, mostrar indicador amarelo único `Atualizando agenda` no rodapé da AGENDA, fazer troca controlada após sucesso, preservar dados se falhar e tratar mudança de data sem mostrar eventos antigos indevidamente.
-- [ ] **ICS/SD:** integridade de arquivos, recorrência, fusos, backups, download, erros e reprocessamento. Verificar bootstrap local→HTTPS, atualização automática periódica, intervalo de retry e recuperação `.bak` caso o arquivo novo não seja parseável.
+- [ ] **ICS/SD:** integridade de arquivos, recorrência, fusos, backups, download, erros e reprocessamento. **Não restaurar backup de operação anterior se o download presente falhou antes de instalar novo ICS.** Verificar bootstrap local→HTTPS, atualização automática periódica, intervalo de retry e recuperação `.bak` caso o arquivo novo não seja parseável.
 - [ ] **Segurança:** segredos fora do código compartilhado; reconhecer TLS sem verificação como risco real da implementação conhecida.
 - [ ] **Regressão:** preservar HOME, touch, Serial, botões HOME, eventos reais e funções já validadas.
 - [ ] **Compilação e hardware:** executar quando o ambiente estiver disponível; caso contrário, marcar explicitamente como **não executados**.
@@ -113,6 +114,9 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 | R-011 | v1.9.2.1: texto amarelo de atualização com caracteres ausentes/corrompidos (`Atualizao...`) na tela | Verificar caracteres suportados pela fonte TFT_eSPI e largura real do rodapé; usar expressão legível e adequada (`Atualizando agenda`), sem UTF-8 não suportado; confirmar no CYD. A v1.9.2.2 implementa o ajuste, teste pendente. |
 
 | R-012 | Risco de produção: firmware inicia no horário simulado ou lê apenas ICS local, impedindo agenda real atualizada | Verificar `simulation=false` no boot, sincronização NTP, carregamento local inicial, download HTTPS automático, atualização periódica e virada de dia. Aplicado em v1.9.3, testes reais pendentes. |
+
+| R-013 | v1.9.3.1: HTTP=-1 ao acessar ICS Outlook | No core ESP32 3.3.12, -1 significa falha de conexão; usar erro HTTP, TLS, DNS e TCP, sem divulgar URL. v1.9.3.2 acrescenta diagnósticos, ainda sem confirmação de causa. |
+| R-014 | v1.9.3.1: restauração indiscriminada de `.bak` após falha de HTTPS | Restrição na v1.9.3.2: restaurar somente arquivo substituído na mesma tentativa de atualização; validar em hardware. |
 
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
