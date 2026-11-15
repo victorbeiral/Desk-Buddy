@@ -56,7 +56,9 @@ Todo novo sketch gerado deverá ser organizado com **seções numeradas, identif
 | D-012 | Preservar AGENDA visível durante releitura ICS, com um único indicador amarelo | Evita interromper a consulta dos eventos. Implementado e confirmado pelo usuário na v1.9.2.1; exibição incorreta da frase acentuada motivou substituição por `Atualizando agenda` na v1.9.2.2 (a validar). |
 | D-013 | Remover somente o botão HOME superior da AGENDA, preservando o inferior | Pedido do usuário após inspeção visual da v1.9.2.1; evita duplicidade visual. O toque na antiga área superior também deixa de navegar na AGENDA; outras telas mantêm o comportamento existente. **Confirmado pelo usuário na v1.9.2.2.** |
 | D-014 | Ativar modo real automático de agenda na v1.9.3 | A v1.9.3.1 comprovou Wi-Fi, modo real, leitura local e tentativa automática por HTTPS no CYD. **HTTP=-1:** falha online a diagnosticar. |
-| D-015 | Distinguir agenda local de falha online e preservar backup | Na v1.9.3.2, mostrar `Outlook nao atualizado` se o ICS local válido persistir, registrar DNS/TCP/TLS sem URL privada e restaurar `.bak` somente se esta tentativa instalou outro ICS; pendente de teste em hardware. |
+| D-015 | Distinguir agenda local de falha online e preservar backup | Na v1.9.3.2, preservação do ICS local foi comprovada por logs durante falha HTTPS; diagnóstico determinou `SSL - Memory allocation failed`. |
+| D-016 | Reduzir memória gráfica para tornar possível o handshake TLS no CYD sem PSRAM | v1.9.3.3 usa sprite indexado 4 bpp (38.400 B, em vez de 76.800 B), paleta de 9 cores e sobreposição de fonte Noto em RGB565 diretamente no TFT. Libera Strings dos UIDs de exceção ao fim do processamento. Novo código pendente de compilação real/validação visual e HTTPS. |
+| D-017 | Corrigir inversão Y detectada após remoção do HOME superior | Log de toques físicos no HOME inferior trouxe y=10–24 (topo), indicativo de eixo Y invertido. v1.9.3.3 muda `touchInvertY=false` globalmente; requer teste dos quatro cartões HOME e botão inferior para evitar regressões. |
 
 As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reorganização. Não representam validação nova de hardware.
 
@@ -77,7 +79,7 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 - [ ] **Pinos:** TFT/backlight/touch/SD, modos INPUT/OUTPUT, pinos só entrada, pinos de boot e conflitos de GPIO.
 - [ ] **Variante exata CYD:** ESP32-2432S028, ILI9341, XPT2046, orientação e peculiaridades do equipamento confirmado.
 - [ ] **Bibliotecas/core:** includes disponíveis, APIs compatíveis, configuração TFT_eSPI, core ESP32 3.3.12 e seleção de SD. Conferir **argumentos padrão apenas uma vez**, preferencialmente nos protótipos; evitar nomes genéricos conflitantes e **vetores locais `static` em funções de uma única linha** (falhas de v1.9.2 e v1.9.3); quando possível, executar compilação real Arduino em vez de confiar somente em stubs.
-- [ ] **RAM e pilhas:** heap livre, sprite 320 × 240 × 8 bits, Strings, buffers ICS, stack FreeRTOS, risco de fragmentação.
+- [ ] **RAM e pilhas:** heap livre, sprite (8 ou 4 bpp), Strings, buffers ICS, stack FreeRTOS, risco de fragmentação. Para TLS, medir **heap total e maior bloco contínuo de 8 bits**; `-32512` evidenciou alocação insuficiente na v1.9.3.2.
 - [ ] **Bloqueios:** HTTPS, Wi-Fi, leitura de SD/ICS, delays/loops, tempo de resposta touch e Serial.
 - [ ] **Touch:** XPT2046, IRQ36 INPUT, calibração, debounce, transformação X/Y, zonas dos cartões e retorno HOME. Toda remoção de botão deve remover também sua área de toque, sem afetar as outras telas.
 - [ ] **SPI:** barramentos e CS de TFT/SD/touch, clocks, inicialização e concorrência no acesso.
@@ -117,6 +119,9 @@ As decisões D-009 a D-011 refletem a orientação do usuário adotada nesta reo
 
 | R-013 | v1.9.3.1: HTTP=-1 ao acessar ICS Outlook | No core ESP32 3.3.12, -1 significa falha de conexão; usar erro HTTP, TLS, DNS e TCP, sem divulgar URL. v1.9.3.2 acrescenta diagnósticos, ainda sem confirmação de causa. |
 | R-014 | v1.9.3.1: restauração indiscriminada de `.bak` após falha de HTTPS | Restrição na v1.9.3.2: restaurar somente arquivo substituído na mesma tentativa de atualização; validar em hardware. |
+
+| R-015 | v1.9.3.2: `HTTP=-1`, TLS `-32512 SSL - Memory allocation failed`; DNS e TCP 443 OK | `HTTP=-1` é efeito de falha TLS por falta/fragmentação de memória, comprovado pelo erro de alocação. v1.9.3.3 reduz sprite de 8 para 4 bits, descarrega UIDs temporários de exceções e mede o maior bloco contíguo. HTTPS ainda pendente de sucesso em hardware. |
+| R-016 | v1.9.3.2: tentativa de usar HOME inferior gera toques em x~260, y~15 | `touchInvertY=true` converte o toque inferior para faixa superior, que agora é desativada. Ajuste proposto: `touchInvertY=false`, testar regressão de HOME/AGENDA/CLIMA/+ no CYD. |
 
 **Evolução:** sempre que um novo problema for identificado **e considerado passível de voltar a ocorrer**, acrescentar nova linha nesta tabela e, quando pertinente, novo item à checklist mínima. Não apagar o histórico de erros.
 
