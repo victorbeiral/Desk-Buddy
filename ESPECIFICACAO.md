@@ -1,7 +1,7 @@
 # Desk Buddy — Especificação funcional e técnica
 
 **Base documental:** reorganização do documento mestre rev. 1.6, em 13/11/2026.
-**Referência funcional mais recente confirmada pelo usuário:** v1.9.2.1 (AGENDA preservada durante releitura, indicador visível com problema de caracteres e navegação touch). **v1.9.2.2:** ajuste visual entregue, pendente de compilação e validação no CYD.
+**Referência de interface mais recente confirmada pelo usuário:** v1.9.2.2 (indicador `Atualizando agenda`, HOME somente inferior na AGENDA e preservação da navegação). **v1.9.3:** preparado para uso real automático, compilação Arduino e teste CYD pendentes.
 **Estado:** especificação consolidada como referência de trabalho; revisão integral do conteúdo ainda pendente de aprovação.
 **Escopo:** descrever **como o sistema deve funcionar**. Motivações ficam em [DECISOES.md](DECISOES.md); evidências de testes em [VERSOES.md](VERSOES.md).
 
@@ -88,7 +88,9 @@ A AGENDA deve priorizar **o que está acontecendo agora** ou **o próximo compro
 - Armazenar o calendário no microSD como `/agenda.ics`. Usar `/agenda.tmp` e `/agenda.bak` durante substituição e recuperação.
 - Validar ao menos a abertura `BEGIN:VCALENDAR` antes de substituir o arquivo existente; preservar cópia anterior em caso de falha de substituição.
 - Processar a leitura ICS em **tarefa FreeRTOS em segundo plano**, mantendo interface e comandos responsivos.
-- Na inicialização, após disponibilidade de SD e horário válido, permitir leitura da cópia local; prover comandos separados para reler o arquivo e baixar nova cópia.
+- **Modo de uso real (v1.9.3, pendente de testes):** iniciar com simulação **desligada**; sincronizar hora por NTP; ler primeiro a cópia ICS local para o dia atual (se existir), depois baixar a versão atualizada por HTTPS; atualizar novamente por HTTPS a cada **30 minutos** em uso real, com nova tentativa após **10 minutos** em caso de falha. Estes intervalos são parâmetros iniciais de operação sujeitos a revisão após testes.
+- Na virada de dia, refazer a seleção do dia atual, não mostrar a agenda do dia anterior como se fosse atual, e buscar atualização HTTPS. Se não existir ICS local, baixar diretamente. Preservar os últimos dados válidos durante o processamento; evitar publicar lista incompleta após falhas.
+- Comandos Serial `E` (somente releitura local), `I` (download forçado) e `T`/`R` (simulação/real) permanecem disponíveis; o modo `T` não dispara atualizações periódicas. O arquivo `config_secrets.h` continua como única origem de credenciais e URL privada.
 - Zona de horário principal de teste: São Paulo, `BRT3` (UTC−3 nas datas atuais); sincronização NTP com a rede.
 - Tratar, na medida suportada pelo parser parcial, VEVENT simples, recorrências, exclusões, exceções e TZIDs Windows.
 - O parser **não é implementação integral do RFC 5545**. Casos ainda limitados incluem recorrências mensais/anuais e regras `BY*`, `RDATE`, `COUNT`, `EXDATE`, `RANGE=THISANDFUTURE`, `VTIMEZONE`, DST histórico e eventos de dia inteiro. Não afirmar cobertura completa pelo fato de seis reuniões conhecidas aparecerem corretamente.
@@ -138,7 +140,7 @@ Variáveis privadas mantidas fora do sketch público: `WIFI_SSID`, `WIFI_PASSWOR
 - HOME inicial, relógio/data/Wi-Fi corretos, cartões sem regressão visual.
 - Touch permite abrir AGENDA, CLIMA e os placeholders, além de voltar à HOME.
 - Leitura/atualização ICS não bloqueia a navegação nem o monitor Serial.
-- **v1.9.2.1 validada visualmente pelo usuário:** a releitura não oculta eventos nem contador; o indicador amarelo aparece no rodapé, porém seu texto com acentuação foi exibido incorretamente. **v1.9.2.2 (pendente de validação):** mostrar `Atualizando agenda` completo no rodapé, remover HOME superior somente da AGENDA e preservar HOME inferior e snapshot consistente.
+- **v1.9.2.1 validada visualmente pelo usuário:** a releitura não oculta eventos nem contador; o indicador amarelo aparece no rodapé, porém seu texto com acentuação foi exibido incorretamente. **v1.9.2.2 (confirmada pelo usuário):** mensagem `Atualizando agenda` completa e botão HOME apenas inferior na AGENDA; **v1.9.3 pendente:** NTP, busca automática HTTPS e rotação diária.
 - Seis compromissos conhecidos do cenário de teste preservados; tela mostra somente os dois prioritários e contador correto.
 - Releitura/atualização de ICS, mudança de dia e modo real merecem revalidação por versão.
 - Sem corrupção de microSD, travamento, artefatos gráficos persistentes ou reset inesperado em uso prolongado.
